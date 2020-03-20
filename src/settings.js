@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: '大屯煤电评优评先系统',
 
   /**
    * @type {boolean} true | false
