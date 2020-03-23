@@ -40,11 +40,6 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="密码" align="center" width="150">
-        <template slot-scope="scope">
-          <span>{{ scope.row.password }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="姓名" align="center" width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
@@ -65,10 +60,17 @@
           <span>{{ scope.row.department || '暂无部门' }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="打分权限" align="center" width="200">
+        <template slot-scope="scope">
+          <el-tag type="success">
+            {{ scope.row.department }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" icon="el-icon-setting" size="mini" @click="confirmUpdatePsw(row)">
-            重置密码
+            修改权限
           </el-button>
           <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="confirmUpdatePsw(row)">
             删除
@@ -233,6 +235,10 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+    },
+    confirmUpdatePsw(raw) {
+      // this.dialogFormVisible = true
+      console.log(raw)
     },
     handleModifyStatus(row, status) {
       this.$message({

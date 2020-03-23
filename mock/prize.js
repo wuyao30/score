@@ -80,8 +80,46 @@ const specificCategory = [
     specificCategoryName: '先进团支部'
   },
   {
-    id: 6,
+    id: 7,
     specificCategoryName: '光荣团支部'
+  }
+]
+const prizeDetails = [
+  {
+    prizeId: 1,
+    prizeName: '优秀团员',
+    selectRule: '本奖项包含四种类型评选规则，包含政治素质、工作业绩、业务能力与形象作风。',
+    startDate: '2020-03-01',
+    endDate: '2020-03-20',
+    reportNum: 10,
+    highNinety: 4
+  },
+  {
+    prizeId: 2,
+    prizeName: '优秀团员',
+    selectRule: '本奖项包含四种类型评选规则，包含政治素质、工作业绩、业务能力与形象作风。',
+    startDate: '2020-03-01',
+    endDate: '2020-03-20',
+    reportNum: 10,
+    highNinety: 4
+  },
+  {
+    prizeId: 3,
+    prizeName: '优秀团员',
+    selectRule: '本奖项包含四种类型评选规则，包含政治素质、工作业绩、业务能力与形象作风。',
+    startDate: '2020-03-01',
+    endDate: '2020-03-20',
+    reportNum: 10,
+    highNinety: 4
+  },
+  {
+    prizeId: 4,
+    prizeName: '优秀团员',
+    selectRule: '本奖项包含四种类型评选规则，包含政治素质、工作业绩、业务能力与形象作风。',
+    startDate: '2020-03-01',
+    endDate: '2020-03-20',
+    reportNum: 10,
+    highNinety: 4
   }
 ]
 
@@ -135,6 +173,18 @@ export default [
     }
   },
   {
+    url: '/prize/info',
+    type: 'get',
+    response: config => {
+      return {
+        code: 20000,
+        data: {
+          specificCategory
+        }
+      }
+    }
+  },
+  {
     url: '/api/upload',
     type: 'post',
     response: config => {
@@ -153,6 +203,16 @@ export default [
       return {
         code: 20000,
         data: 'success'
+      }
+    }
+  },
+  {
+    url: '/api/prizesDetail',
+    type: 'get',
+    response: config => {
+      return {
+        code: 20000,
+        data: prizeDetails
       }
     }
   }

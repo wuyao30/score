@@ -86,6 +86,32 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/prize',
+    component: Layout,
+    name: 'prize',
+    children: [
+      {
+        path: 'index',
+        name: 'prizeIndex',
+        component: () => import('@/views/prize/index'),
+        meta: { title: '奖项管理', icon: 'jiangxiang'}
+      }
+    ]
+  },
+  {
+    path: '/score',
+    component: Layout,
+    name: 'score',
+    children: [
+      {
+        path: 'index',
+        name: 'scoreIndex',
+        component: () => import('@/views/score/index'),
+        meta: { title: '评优评先', icon: 'pingjia' }
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

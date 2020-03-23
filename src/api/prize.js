@@ -37,3 +37,17 @@ export function updateReport(data) {
     data
   })
 }
+
+export function prizesDetail() {
+  return request({
+    url: '/api/prizesDetail',
+    method: 'get'
+  })
+}
+
+export function queryAllPrizes() {
+  return request({
+    url: '/prize/info',
+    method: 'get'
+  })
+}
