@@ -1,9 +1,6 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="listQuery.prizeKind" placeholder="奖项大类" clearable style="width: 250px" class="filter-item" @change="mainChange">
-        <el-option v-for="item in prizeKindOptions" :key="item.id" :label="item.mainCategoryName" :value="item.id" />
-      </el-select>
       <el-select v-model="listQuery.prizeName" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
         <el-option v-for="item in prizeNameOptions" :key="item.id" :label="item.specificCategoryName" :value="item.id" />
       </el-select>
@@ -21,27 +18,37 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column v-show="false" label="ID" prop="id" align="center" width="80">
+      <el-table-column label="ID" prop="id" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.reportId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="奖项大类" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.prizeKind }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="奖项名称" width="200px" align="center">
+      <el-table-column label="奖项名称" width="140" align="center">
         <template slot-scope="{row}">
           <span>{{ row.prizeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="照片" width="200px" align="center">
+      <el-table-column label="申报人员姓名" width="110" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.reportName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="单位" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.company }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="部门" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.department }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-avatar v-for="item in row.reportPhotos" :key="item.url" shape="square" :size="100" fit="fill" :src="item.url"></el-avatar>
         </template>
       </el-table-column>
-      <el-table-column label="简介" width="270px" align="center">
+      <el-table-column label="简介" width="350px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportInfo }}</span>
         </template>
@@ -53,7 +60,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
@@ -68,7 +75,16 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="fetchAllMinePrize" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="姓名" prop="reportName">
+          <el-input v-model="temp.reportName" placeholder="请输入申报人员姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="单位" prop="company">
+          <el-input v-model="temp.company" placeholder="请输入单位名称"></el-input>
+        </el-form-item>
+        <el-form-item label="部门" prop="department">
+          <el-input v-model="temp.department" placeholder="请输入部门名称"></el-input>
+        </el-form-item>
         <el-form-item label="照片">
           <el-upload
             class="upload-demo"
@@ -112,7 +128,7 @@
 </template>
 
 <script>
-import { updateReport, getAllPrize, getMyAllPrizes, getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
+import { updateReport, getMyAllPrizes, getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -138,7 +154,6 @@ export default {
         'http://139.224.135.165:8080/download/2.jpg'],
       fileListPicture: [],
       fileList: [],
-      prizeKindOptions: [{ id: -1, mainCategoryName: '请选择奖项大类' }],
       prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
       tableKey: 0,
       list: null,
@@ -172,16 +187,29 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' },
+          { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+        ],
+        company: [
+          { required: true, message: '请输入单位名称', trigger: 'blur' }
+        ],
+        department: [
+          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        ],
+        specId: [
+          { required: true, message: '请选择具体奖项', trigger: 'change' }
+        ],
+        reportInfo: [
+          { required: true, message: '请输入简介信息', trigger: 'blur' }
+        ]
       },
       downloadLoading: false
     }
   },
   created() {
     this.fetchAllMinePrize()
-    this.fetchMainPrizeKinds()
+    this.fetchPrizesName()
   },
   methods: {
     handleSubmit() {
@@ -202,16 +230,10 @@ export default {
       this.dialogFormVisible = false
       this.fetchAllMinePrize()
     },
-    mainChange(value) {
-      getSpecificPrizeKind({ id: value }).then(response => {
+    fetchPrizesName() {
+      getSpecificPrizeKind().then(response => {
         this.prizeNameOptions = response.data.specificCategory
-        console.log(this.prizeNameOptions)
-      })
-    },
-    fetchMainPrizeKinds() {
-      getMainPrizeKind().then(response => {
-        this.prizeKindOptions = response.data.mainCategory
-        console.log(this.prizeKindOptions)
+        // console.log(this.prizeNameOptions)
       })
     },
     fetchAllMinePrize() {

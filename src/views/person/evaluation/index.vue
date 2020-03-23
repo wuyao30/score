@@ -111,13 +111,8 @@
         <el-form-item label="部门" prop="department">
           <el-input v-model="temp.department" />
         </el-form-item>
-        <el-form-item label="奖项大类" prop="mainId">
-          <el-select v-model="temp.mainId" placeholder="请选择奖项大类" @change="mainChange">
-            <el-option v-for="item in prizeKindOptions" :key="item.mainCategoryName" :label="item.mainCategoryName" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="奖项名称" prop="specId">
-          <el-select v-model="temp.specId" placeholder="请选择奖项名称">
+        <el-form-item label="奖项名称" prop="prizeId">
+          <el-select v-model="temp.prizeId" placeholder="请选择奖项名称">
             <el-option v-for="item in prizeNameOptions" :key="item.specificCategoryName" :label="item.specificCategoryName" :value="item.id" :disabled="item.disabled" />
           </el-select>
         </el-form-item>
@@ -153,8 +148,7 @@ export default {
   directives: { waves },
   data() {
     return {
-      prizeKindOptions: [],
-      prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
+      prizeNameOptions: [],
       tableKey: 0,
       list: null,
       total: 0,
@@ -175,8 +169,7 @@ export default {
         phone: undefined,
         company: undefined,
         department: undefined,
-        mainId: undefined,
-        specId: undefined
+        prizeId: undefined
       },
       dialogFormVisible: false,
       rules: {
@@ -191,8 +184,7 @@ export default {
         phone: [{ required: true, message: '手机号码为必填项', trigger: 'blur' }],
         company: [{ required: true, message: '单位为必填项', trigger: 'blur' }],
         department: [{ required: true, message: '部门为必填项', trigger: 'blur' }],
-        mainId: [{ required: true, message: '奖项大类为必填项', trigger: 'change' }],
-        specId: [{ required: true, message: '奖项名称为必填项', trigger: 'change' }]
+        prizeId: [{ required: true, message: '奖项名称为必填项', trigger: 'change' }]
       },
       downloadLoading: false,
       myBackToTopStyle: {
@@ -208,19 +200,13 @@ export default {
   },
   created() {
     this.getList()
-    this.fetchMainPrizeKinds()
+    this.fetchPrizesName()
   },
   methods: {
-    mainChange(value) {
-      getSpecificPrizeKind({ id: value }).then(response => {
+    fetchPrizesName() {
+      getSpecificPrizeKind().then(response => {
         this.prizeNameOptions = response.data.specificCategory
         // console.log(this.prizeNameOptions)
-      })
-    },
-    fetchMainPrizeKinds() {
-      getMainPrizeKind().then(response => {
-        this.prizeKindOptions = response.data.mainCategory
-        // console.log(this.prizeKindOptions)
       })
     },
     getList() {
@@ -237,7 +223,7 @@ export default {
       })
     },
     confirmUpdatePsw(raw) {
-      // this.dialogFormVisible = true
+      this.dialogFormVisible = true
       console.log(raw)
     },
     handleModifyStatus(row, status) {

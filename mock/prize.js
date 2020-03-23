@@ -19,8 +19,10 @@ const Prizes = [
 const myPrizes = [
   {
     reportId: 1,
-    prizeKind: '优秀团支部大类',
     prizeName: 'league branch excellent awards',
+    reportName: '张三',
+    company: 'alibaba',
+    department: 'front depart',
     reportPhotos: [
       {
         url: 'http://139.224.135.165:8080/download/2.jpg'
@@ -38,7 +40,9 @@ const myPrizes = [
   },
   {
     reportId: 2,
-    prizeKind: '优秀团员大类',
+    reportName: '张三',
+    company: 'tecent',
+    department: 'front depart',
     prizeName: 'member excellent awards',
     reportPhotos: [
       {
@@ -54,20 +58,6 @@ const myPrizes = [
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' }
     ]
-  }
-]
-const mainCategory = [
-  {
-    id: 1,
-    mainCategoryName: '团支部奖项'
-  },
-  {
-    id: 2,
-    mainCategoryName: '团员奖项'
-  },
-  {
-    id: 3,
-    mainCategoryName: '党员奖项'
   }
 ]
 const specificCategory = [
@@ -92,7 +82,7 @@ const prizeDetails = [
     startDate: '2020-03-01',
     endDate: '2020-03-20',
     reportNum: 10,
-    highNinety: 4
+    winNum: 4
   },
   {
     prizeId: 2,
@@ -101,7 +91,7 @@ const prizeDetails = [
     startDate: '2020-03-01',
     endDate: '2020-03-20',
     reportNum: 10,
-    highNinety: 4
+    winNum: 4
   },
   {
     prizeId: 3,
@@ -110,7 +100,7 @@ const prizeDetails = [
     startDate: '2020-03-01',
     endDate: '2020-03-20',
     reportNum: 10,
-    highNinety: 4
+    winNum: 4
   },
   {
     prizeId: 4,
@@ -119,7 +109,7 @@ const prizeDetails = [
     startDate: '2020-03-01',
     endDate: '2020-03-20',
     reportNum: 10,
-    highNinety: 4
+    winNum: 4
   }
 ]
 
@@ -144,18 +134,6 @@ export default [
         code: 20000,
         data: {
           myPrizes
-        }
-      }
-    }
-  },
-  {
-    url: '/api/main',
-    type: 'get',
-    response: config => {
-      return {
-        code: 20000,
-        data: {
-          mainCategory
         }
       }
     }

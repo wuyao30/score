@@ -178,10 +178,11 @@ $light_gray:#eee;
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-image: url("http://139.224.135.165:8080/download/5.jpg");
+  background: $bg;
+  /*background-image: url("http://139.224.135.165:8080/download/5.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  background-color: $bg;
+  background-color: $bg;*/
   overflow: hidden;
   .login-form {
     position: relative;
@@ -190,7 +191,7 @@ $light_gray:#eee;
     padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
-    background: $dark_gray;
+    // background: $dark_gray;
 
     .button-container {
       display: flex;

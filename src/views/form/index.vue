@@ -1,17 +1,18 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-      <el-form-item label="申报人员姓名" prop="name">
+      <el-form-item label="申报人员名称" prop="name">
         <el-input v-model="form.name" width="80" />
       </el-form-item>
-      <el-form-item label="奖项大类" prop="mainId">
-        <el-select v-model="form.mainId" placeholder="请选择奖项大类" @change="mainChange">
-          <el-option v-for="item in prizeKindOptions" :key="item.mainCategoryName" :label="item.mainCategoryName" :value="item.id" />
-        </el-select>
+      <el-form-item label="单位" prop="company">
+        <el-input v-model="form.company" width="80" />
       </el-form-item>
-      <el-form-item label="奖项名称" prop="specId">
-        <el-select v-model="form.specId" placeholder="请选择奖项名称">
-          <el-option v-for="item in prizeNameOptions" :key="item.specificCategoryName" :label="item.specificCategoryName" :value="item.id" :disabled="item.disabled" />
+      <el-form-item label="部门" prop="department">
+        <el-input v-model="form.department" width="80" />
+      </el-form-item>
+      <el-form-item label="奖项名称" prop="prizeId">
+        <el-select v-model="form.prizeId" placeholder="请选择奖项名称">
+          <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.specificCategoryName" :value="item.id" :disabled="item.disabled" />
         </el-select>
       </el-form-item>
       <el-form-item label="照片">
@@ -27,7 +28,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item label="简介" prop="reportInfo">
-        <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="Please input" />
+        <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
       </el-form-item>
       <el-form-item label="附件">
         <el-upload
@@ -45,7 +46,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
-        <el-button @click="resetForm('ruleForm')">重置</el-button>
+        <el-button @click="resetForm('form')">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -57,12 +58,12 @@ import { getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
 export default {
   data() {
     return {
-      prizeKindOptions: [{ id: -1, mainCategoryName: '请选择奖项大类' }],
       prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类', disabled: true }],
       form: {
         name: '',
-        mainId: undefined,
-        specId: undefined,
+        company: '',
+        department: '',
+        prizeId: undefined,
         reportInfo: '',
         formPictures: [],
         formFiles: []
@@ -72,8 +73,11 @@ export default {
           { required: true, message: '请输入姓名', trigger: 'blur' },
           { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
         ],
-        mainId: [
-          { required: true, message: '请选择奖项大类', trigger: 'change' }
+        company: [
+          { required: true, message: '请输入单位名称', trigger: 'blur' }
+        ],
+        department: [
+          { required: true, message: '请输入部门名称', trigger: 'blur' }
         ],
         specId: [
           { required: true, message: '请选择具体奖项', trigger: 'change' }
@@ -93,7 +97,7 @@ export default {
     }
   },
   created() {
-    this.fetchMainPrizeKinds()
+    this.fetchPrizesNames()
   },
   methods: {
     submitForm(formName) {
@@ -110,20 +114,12 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    mainChange(value) {
-      getSpecificPrizeKind({ id: value }).then(response => {
+    fetchPrizesNames() {
+      getSpecificPrizeKind().then(response => {
         this.prizeNameOptions = response.data.specificCategory
-        // console.log(this.prizeNameOptions)
-      })
-    },
-    fetchMainPrizeKinds() {
-      getMainPrizeKind().then(response => {
-        this.prizeKindOptions = response.data.mainCategory
-        // console.log(this.prizeKindOptions)
       })
     },
     handlerSuccessFile(response, file, fileList) {
-      // console.log(file, fileList)
       this.form.formFiles.push({
         url: response.data.url,
         name: file.name
@@ -147,6 +143,14 @@ export default {
     },
     beforeRemoveFile(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handlerSuccessPicture(response, file, fileList) {
+      console.log(file, fileList)
+      this.form.formPictures.push({
+        url: response.data.url,
+        name: file.name
+      })
+      console.log(this.form.formPictures)
     },
     handlerSuccessPicture(response, file, fileList) {
       console.log(file, fileList)

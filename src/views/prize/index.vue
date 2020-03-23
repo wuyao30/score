@@ -21,34 +21,34 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="奖项名称" width="150px" align="center">
+      <el-table-column label="奖项名称" width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.prizeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="开始时间" width="150px" align="center">
+      <el-table-column label="开始时间" width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startDate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="结束时间" width="150px" align="center">
+      <el-table-column label="结束时间" width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.endDate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="评选细则" width="250" align="center">
+      <el-table-column label="评选细则" width="350" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.selectRule }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="申报人数" width="150" align="center">
+      <el-table-column label="申报人数" width="110" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.reportNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最终获奖数量" width="150" align="center">
+      <el-table-column label="最终获奖数量" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.highNinety }}</span>
+          <span>{{ scope.row.winNum }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
@@ -150,7 +150,8 @@ export default {
   components: { Pagination },
   data() {
     return {
-      dialogUpdateFormVisible: false,
+      dialogFormVisible: false,
+      dialogInsertFormVisible: false,
       rules: {
         prizeName: [
           { required: true, message: '奖项名称为必填项', trigger: 'blur' }
@@ -206,6 +207,7 @@ export default {
     },
     handleCreate() {
       this.dialogStatus = 'create'
+      this.temp = {}
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()

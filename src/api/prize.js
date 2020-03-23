@@ -22,11 +22,10 @@ export function getMainPrizeKind() {
   })
 }
 
-export function getSpecificPrizeKind(data) {
+export function getSpecificPrizeKind() {
   return request({
     url: '/api/spec',
-    method: 'get',
-    params: data
+    method: 'get'
   })
 }
 
