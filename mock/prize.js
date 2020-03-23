@@ -112,6 +112,26 @@ const prizeDetails = [
     winNum: 4
   }
 ]
+const evaluPrizes = [
+  {
+    reportId: 1,
+    name: 'zhangsan',
+    reportPhotos: [
+      {
+        url: 'http://139.224.135.165:8080/download/2.jpg'
+      },
+      {
+        url: 'http://139.224.135.165:8080/download/3.jpg'
+      }
+    ],
+    reportInfo: 'reportInfo specific introduction',
+    annex: [
+      { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
+      { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
+      { url: 'http://139.224.135.165:8080/download/demo.xlsx' }
+    ]
+  }
+]
 
 export default [
   {
@@ -191,6 +211,16 @@ export default [
       return {
         code: 20000,
         data: prizeDetails
+      }
+    }
+  },
+  {
+    url: '/evaluation/prizes',
+    type: 'get',
+    response: config => {
+      return {
+        code: 20000,
+        data: specificCategory
       }
     }
   }

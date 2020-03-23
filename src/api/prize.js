@@ -50,3 +50,10 @@ export function queryAllPrizes() {
     method: 'get'
   })
 }
+
+export function queryEvaluPrizes() {
+  return request({
+    url: '/evaluation/prizes',
+    method: 'get'
+  })
+}
