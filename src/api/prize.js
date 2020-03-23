@@ -51,9 +51,9 @@ export function queryAllPrizes() {
   })
 }
 
-export function queryEvaluPrizes() {
+export function queryEvaluationPrizeInfo() {
   return request({
-    url: '/evaluation/prizes',
+    url: '/evaluation/prize',
     method: 'get'
   })
 }

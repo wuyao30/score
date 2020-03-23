@@ -1,8 +1,5 @@
 <template>
   <div class="app-container">
-    <!--<div class="table-title">-->
-      <!--<span>评优评先打分页面</span>-->
-    <!--</div>-->
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -29,7 +26,11 @@
       </el-table-column>
       <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-avatar v-for="item in row.reportPhotos" :key="item.url" shape="square" :size="100" fit="fill" :src="item.url"></el-avatar>
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="row.reportPhotos[0]"
+            :preview-src-list="row.reportPhotos">
+          </el-image>
         </template>
       </el-table-column>
       <el-table-column label="相关材料" align="center" width="80">
@@ -69,14 +70,14 @@
     </el-table>
 
     <div class="submit-container">
-      <el-button type="primary" @click="submitForm">立即创建</el-button>
-      <el-button @click="resetForm">重置</el-button>
+      <el-button type="primary" @click="submitForm">提交打分</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { getMyAllPrizes } from '../../api/prize'
+import { getMyAllPrizes, queryEvaluationPrizeInfo } from '../../api/prize'
+const STANDARDSCORE = 30
 export default {
   name: 'Index',
   data() {
@@ -84,11 +85,15 @@ export default {
       listLoading: true,
       tableKey: 0,
       temp: {},
-      list: []
+      list: [],
+      prize: {}
     }
   },
   created() {
     this.fetchEvaluationPrize()
+    queryEvaluationPrizeInfo().then(response => {
+      this.prize = response.data
+    })
   },
   methods: {
     totalScore(scope) {
@@ -111,6 +116,25 @@ export default {
       })
     },
     submitForm() {
+      const highScore = this.list.filter(function (elem) {
+        elem.totatScore > STANDARDSCORE
+      })
+      if( highScore > this.prize.winNum) {
+        this.$message({
+          message: '打分结果大于标准要求数量',
+          type: 'error'
+        })
+      }else if ( highScore < this.prize.winNum ) {
+        this.$message({
+          message: '打分结果小于标准要求数量',
+          type: 'error'
+        })
+      } else {
+        this.$message({
+          message: '提交成功',
+          type: 'success'
+        })
+      }
       console.log(this.list)
     }
   }
@@ -120,5 +144,10 @@ export default {
 <style scoped>
   .app-container{
     padding-top: 15px;
+  }
+  .submit-container {
+    text-align: right;
+    margin-top: 10px;
+    margin-right: 20px;
   }
 </style>

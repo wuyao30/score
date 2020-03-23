@@ -45,7 +45,11 @@
       </el-table-column>
       <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-avatar v-for="item in row.reportPhotos" :key="item.url" shape="square" :size="100" fit="fill" :src="item.url"></el-avatar>
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="row.reportPhotos[0]"
+            :preview-src-list="row.reportPhotos">
+          </el-image>
         </template>
       </el-table-column>
       <el-table-column label="简介" width="350px" align="center">
@@ -316,22 +320,18 @@ export default {
     },
     handlerSuccessPicture(response, file, fileList) {
       console.log(file, fileList)
-      this.temp.reportPhotos.push({
-        url: response.data.url,
-        name: file.name
-      })
+      this.temp.reportPhotos.push(response.data.url)
     },
     handlerErrorPicture(err, file, fileList) {
       console.log(err, file, fileList)
       this.$message.error('上传图片失败，请刷新重试')
     },
     handleRemovePicture(file, fileList) {
-      console.log(file, fileList)
-      console.log(this.temp)
+      console.log(file,fileList)
       let PictureIndex = this.temp.reportPhotos.findIndex(elem => {
         elem.name === file.name
       })
-      this.temp.annex.splice(PictureIndex, 1)
+      this.temp.reportPhotos.splice(PictureIndex, 1)
       console.log(this.temp.reportPhotos)
     },
     beforeRemovePicture(file, fileList) {

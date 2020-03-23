@@ -23,13 +23,8 @@ const myPrizes = [
     reportName: '张三',
     company: 'alibaba',
     department: 'front depart',
-    reportPhotos: [
-      {
-        url: 'http://139.224.135.165:8080/download/2.jpg'
-      },
-      {
-        url: 'http://139.224.135.165:8080/download/3.jpg'
-      }
+    reportPhotos: ['http://139.224.135.165:8080/download/2.jpg',
+      'http://139.224.135.165:8080/download/3.jpg'
     ],
     reportInfo: 'reportInfo specific introduction',
     annex: [
@@ -44,13 +39,8 @@ const myPrizes = [
     company: 'tecent',
     department: 'front depart',
     prizeName: 'member excellent awards',
-    reportPhotos: [
-      {
-        url: 'http://139.224.135.165:8080/download/2.jpg'
-      },
-      {
-        url: 'http://139.224.135.165:8080/download/3.jpg'
-      }
+    reportPhotos: ['http://139.224.135.165:8080/download/2.jpg',
+      'http://139.224.135.165:8080/download/3.jpg'
     ],
     reportInfo: 'reportInfo specific introduction',
     annex: [
@@ -110,26 +100,6 @@ const prizeDetails = [
     endDate: '2020-03-20',
     reportNum: 10,
     winNum: 4
-  }
-]
-const evaluPrizes = [
-  {
-    reportId: 1,
-    name: 'zhangsan',
-    reportPhotos: [
-      {
-        url: 'http://139.224.135.165:8080/download/2.jpg'
-      },
-      {
-        url: 'http://139.224.135.165:8080/download/3.jpg'
-      }
-    ],
-    reportInfo: 'reportInfo specific introduction',
-    annex: [
-      { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
-      { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
-      { url: 'http://139.224.135.165:8080/download/demo.xlsx' }
-    ]
   }
 ]
 
@@ -215,12 +185,20 @@ export default [
     }
   },
   {
-    url: '/evaluation/prizes',
+    url: '/evaluation/prize',
     type: 'get',
     response: config => {
       return {
         code: 20000,
-        data: specificCategory
+        data: {
+          prizeId: 1,
+          prizeName: '优秀团员',
+          selectRule: '本奖项包含四种类型评选规则，包含政治素质、工作业绩、业务能力与形象作风。',
+          startDate: '2020-03-01',
+          endDate: '2020-03-20',
+          reportNum: 10,
+          winNum: 4
+        }
       }
     }
   }
