@@ -8,6 +8,13 @@ export function getAllPrize(data) {
   })
 }
 
+export function queryChartData() {
+  return request({
+    url: '/prize/chart',
+    method: 'get'
+  })
+}
+
 export function getMyAllPrizes() {
   return request({
     url: '/api/mineAllPrize',

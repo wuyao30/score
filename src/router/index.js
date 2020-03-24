@@ -50,6 +50,19 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
+      component: () => import('@/views/chart/index'),
+      meta: {
+        title: '申报情况',
+        icon: 'tongji'
+      }
+    }]
+  },
+  {
+    path: '/mineinfo',
+    component: Layout,
+    children: [{
+      path: 'infoIndex',
+      name: 'infoIndex',
       component: () => import('@/views/dashboard/index'),
       meta: {
         title: '个人申报情况',

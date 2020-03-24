@@ -130,7 +130,21 @@ const allPrizes = [
     prizeName: '奖项3'
   },
 ]
+const chartData = {
+  xData: ['奖项1','奖项2','奖项3','奖项4','奖项5','奖项6','奖项7'],
+  yData: ['10','12','20','8','22','10','50',]
+}
 export default [
+  {
+    url: '/prize/chart',
+    type: 'get',
+    response: config => {
+      return {
+        code: 20000,
+        data: chartData
+      }
+    }
+  },
   {
     url: '/prize/all',
     type: 'get',
