@@ -20,34 +20,48 @@ const myPrizes = [
   {
     reportId: 1,
     prizeName: 'league branch excellent awards',
-    reportName: '张三',
+    title: '张三',
     company: 'alibaba',
     department: 'front depart',
-    reportPhotos: ['http://139.224.135.165:8080/download/2.jpg',
-      'http://139.224.135.165:8080/download/3.jpg'
+    reportPhotos: [
+      {
+        url: 'http://139.224.135.165:8080/download/2.jpg'
+      },
+      {
+        url: 'http://139.224.135.165:8080/download/3.jpg'
+      }
     ],
     reportInfo: 'reportInfo specific introduction',
     annex: [
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' }
-    ]
+    ],
+    average: 10,
+    status: 0
   },
   {
     reportId: 2,
-    reportName: '张三',
+    title: '张三',
     company: 'tecent',
     department: 'front depart',
     prizeName: 'member excellent awards',
-    reportPhotos: ['http://139.224.135.165:8080/download/2.jpg',
-      'http://139.224.135.165:8080/download/3.jpg'
+    reportPhotos: [
+      {
+      url: 'http://139.224.135.165:8080/download/2.jpg'
+      },
+      {
+        url: 'http://139.224.135.165:8080/download/3.jpg'
+      }
     ],
     reportInfo: 'reportInfo specific introduction',
     annex: [
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' },
       { url: 'http://139.224.135.165:8080/download/demo.xlsx' }
-    ]
+    ],
+    average: 12,
+    status: 0
   }
 ]
 const specificCategory = [
@@ -102,8 +116,31 @@ const prizeDetails = [
     winNum: 4
   }
 ]
-
+const allPrizes = [
+  {
+    prizeId: '1',
+    prizeName: '奖项1'
+  },
+  {
+    prizeId: '2',
+    prizeName: '奖项2'
+  },
+  {
+    prizeId: '3',
+    prizeName: '奖项3'
+  },
+]
 export default [
+  {
+    url: '/prize/all',
+    type: 'get',
+    response: config => {
+      return {
+        code: 20000,
+        data: allPrizes
+      }
+    }
+  },
   {
     url: '/api/allPrize',
     type: 'get',

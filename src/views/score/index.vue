@@ -28,8 +28,10 @@
         <template slot-scope="{row}">
           <el-image
             style="width: 100px; height: 100px"
-            :src="row.reportPhotos[0]"
-            :preview-src-list="row.reportPhotos">
+            :src="row.reportPhotos[0].url"
+            :preview-src-list="row.reportPhotos.map(function(elem) {
+              return elem.url
+            })">
           </el-image>
         </template>
       </el-table-column>

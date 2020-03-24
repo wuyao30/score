@@ -57,3 +57,10 @@ export function queryEvaluationPrizeInfo() {
     method: 'get'
   })
 }
+
+export function getAllPrizeNames() {
+  return request({
+    url: '/prize/all',
+    method: 'get'
+  })
+}

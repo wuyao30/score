@@ -116,7 +116,7 @@
             :on-error="handlerErrorFile"
             :limit="5"
             :on-exceed="handleExceedFile"
-            >
+          >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -138,9 +138,8 @@ import { updateReport, getMyAllPrizes, getMainPrizeKind, getSpecificPrizeKind } 
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
 export default {
-  name: 'Dashboard',
+  name: "index",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -344,6 +343,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
   .filter-container{
     margin-bottom: 8px;

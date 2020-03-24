@@ -71,8 +71,11 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            删除
+          <el-button v-waves v-if="row.status=='1'" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,'0')">
+            启用状态
+          </el-button>
+          <el-button v-waves v-if="row.status=='0'" size="mini" icon="el-icon-error" type="danger" @click="handleModifyStatus(row,'1')">
+            禁用状态
           </el-button>
         </template>
       </el-table-column>
@@ -116,7 +119,7 @@
             :on-error="handlerErrorFile"
             :limit="5"
             :on-exceed="handleExceedFile"
-            >
+          >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -130,17 +133,21 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-tooltip placement="top" content="返回顶部">
+      <back-to-top :custom-style="myBackToTopStyle" :visibility-height="300" :back-position="50" transition-name="fade" />
+    </el-tooltip>
   </div>
 </template>
 
 <script>
-import { updateReport, getMyAllPrizes, getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
+import { updateReport, getMyAllPrizes, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: 'Dashboard',
+  name: 'Index',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -155,6 +162,15 @@ export default {
   },
   data() {
     return {
+      myBackToTopStyle: {
+        right: '50px',
+        bottom: '50px',
+        width: '40px',
+        height: '40px',
+        'border-radius': '4px',
+        'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
+        background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
+      },
       pictureArray: [
         'http://139.224.135.165:8080/download/3.jpg',
         'http://139.224.135.165:8080/download/2.jpg'],
@@ -344,8 +360,9 @@ export default {
   }
 }
 </script>
+
 <style scoped>
-  .filter-container{
+  .filter-container {
     margin-bottom: 8px;
   }
 </style>

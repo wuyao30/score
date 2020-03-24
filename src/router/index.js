@@ -51,7 +51,10 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '个人申报情况', icon: 'dashboard' }
+      meta: {
+        title: '个人申报情况',
+        icon: 'dashboard'
+      }
     }]
   },
   {
@@ -95,7 +98,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'prizeIndex',
         component: () => import('@/views/prize/index'),
-        meta: { title: '奖项管理', icon: 'jiangxiang'}
+        meta: { title: '奖项管理', icon: 'jiangxiang' }
       }
     ]
   },
@@ -109,6 +112,45 @@ export const constantRoutes = [
         name: 'scoreIndex',
         component: () => import('@/views/score/index'),
         meta: { title: '评优评先', icon: 'pingjia' }
+      }
+    ]
+  },
+  {
+    path: '/result',
+    component: Layout,
+    name: 'result',
+    children: [
+      {
+        path: 'index',
+        name: 'resultIndex',
+        component: () => import('@/views/result/index'),
+        meta: { title: '打分结果', icon: 'shujujieguotongji' }
+      }
+    ]
+  },
+  {
+    path: '/delete',
+    component: Layout,
+    name: 'delete',
+    children: [
+      {
+        path: 'index',
+        name: 'deleteIndex',
+        component: () => import('@/views/delete/index'),
+        meta: { title: '修改评选资格', icon: 'delete' }
+      }
+    ]
+  },
+  {
+    path: '/mine',
+    component: Layout,
+    name: 'mine',
+    children: [
+      {
+        path: 'index',
+        name: 'mine',
+        component: () => import('@/views/mine/index'),
+        meta: { title: '我的', icon: 'wode' }
       }
     ]
   },
