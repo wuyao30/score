@@ -57,16 +57,28 @@ export const constantRoutes = [
       }
     }]
   },
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
+]
+
+export const asyncRoutes =  [
   {
     path: '/mineinfo',
     component: Layout,
+    name: 'mineinfo',
+    meta: {
+      title: 'mineinfo',
+      icon: 'lock',
+      roles: ['editor'] // you can set roles in root nav
+    },
     children: [{
       path: 'infoIndex',
       name: 'infoIndex',
       component: () => import('@/views/dashboard/index'),
       meta: {
         title: '个人申报情况',
-        icon: 'dashboard'
+        icon: 'dashboard',
+        roles: ['editor']
       }
     }]
   },
@@ -78,7 +90,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: '申报明细填写', icon: 'form' }
+        meta: { title: '申报明细填写', icon: 'form', roles: ['editor'] }
       }
     ]
   },
@@ -86,19 +98,19 @@ export const constantRoutes = [
     path: '/person',
     component: Layout,
     name: 'person',
-    meta: { title: '人员管理', icon: 'renyuanguanli' },
+    meta: { title: '人员管理', icon: 'renyuanguanli', roles: ['admin'] },
     children: [
       {
         path: 'report',
         name: 'report',
         component: () => import('@/views/person/report/index'),
-        meta: { title: '申报人员管理', icon: 'renyuan' }
+        meta: { title: '申报人员管理', icon: 'renyuan', roles: ['admin'] }
       },
       {
         path: 'evaluation',
         name: 'evaluation',
         component: () => import('@/views/person/evaluation/index'),
-        meta: { title: '打分人员管理', icon: 'pingjia' }
+        meta: { title: '打分人员管理', icon: 'pingjia', roles: ['admin'] }
       }
     ]
   },
@@ -111,7 +123,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'prizeIndex',
         component: () => import('@/views/prize/index'),
-        meta: { title: '奖项管理', icon: 'jiangxiang' }
+        meta: { title: '奖项管理', icon: 'jiangxiang', roles: ['admin'] }
       }
     ]
   },
@@ -124,7 +136,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'scoreIndex',
         component: () => import('@/views/score/index'),
-        meta: { title: '评优评先', icon: 'pingjia' }
+        meta: { title: '评优评先', icon: 'pingjia', roles: ['evaluator'] }
       }
     ]
   },
@@ -137,7 +149,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'resultIndex',
         component: () => import('@/views/result/index'),
-        meta: { title: '打分结果', icon: 'shujujieguotongji' }
+        meta: { title: '打分结果', icon: 'shujujieguotongji', roles: ['admin'] }
       }
     ]
   },
@@ -150,7 +162,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'deleteIndex',
         component: () => import('@/views/delete/index'),
-        meta: { title: '修改评选资格', icon: 'delete' }
+        meta: { title: '修改评选资格', icon: 'delete', roles: ['admin'] }
       }
     ]
   },
@@ -160,15 +172,13 @@ export const constantRoutes = [
     name: 'mine',
     children: [
       {
-        path: 'index',
-        name: 'mine',
+        path: 'mineIndex',
+        name: 'mineIndex',
         component: () => import('@/views/mine/index'),
-        meta: { title: '我的', icon: 'wode' }
+        meta: { title: '我的', icon: 'wode', roles: ['editor'] }
       }
     ]
-  },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 
 const createRouter = () => new Router({

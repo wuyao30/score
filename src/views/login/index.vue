@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">大屯煤电评优评先系统</h3>
+        <h3 class="title">大屯公司材料上报系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -42,8 +42,8 @@
       </el-form-item>
 
       <div class="button-container">
-        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">申报账号登陆</el-button>
-        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">打分账号登陆</el-button>
+        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">申报登陆</el-button>
+        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">评选登陆</el-button>
         <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">管理员登陆</el-button>
       </div>
     </el-form>

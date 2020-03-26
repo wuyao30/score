@@ -112,7 +112,7 @@ export default {
           score4: 0,
           totalScore: 0
         }
-        this.list = response.data.myPrizes.map(function(elem, index) {
+        this.list = response.data.myPrizes.map(function(elem) {
           return Object.assign(elem, score)
         })
       })
