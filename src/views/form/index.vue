@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-      <el-form-item label="申报人员名称" prop="name">
+      <el-form-item label="标题" prop="name">
         <el-input v-model="form.name" width="80" />
       </el-form-item>
       <el-form-item label="单位" prop="company">

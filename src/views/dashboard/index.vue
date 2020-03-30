@@ -19,18 +19,18 @@
       @sort-change="sortChange"
     >
       <el-table-column label="ID" align="center" width="80">
-        <template slot-scope="{row}">
-          <span>{{ row.reportId }}</span>
+        <template slot-scope="scope">
+          <span>{{ scope.row.reportId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="奖项名称" width="140" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.prizeName }}</span>
+        <template slot-scope="scope">
+          <span>{{ scope.row.prizeName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="标题" width="110" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.reportName }}</span>
+        <template slot-scope="scope">
+          <span>{{ scope.row.reportName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="单位" width="150px" align="center">
@@ -48,7 +48,7 @@
           <el-image
             style="width: 100px; height: 100px"
             :src="row.reportphotos[0].photoUrl"
-            :preview-src-list="row.reportPhotos.map(function(elem) {
+            :preview-src-list="row.reportphotos.map(function(elem) {
               return elem.photoUrl
             })">
           </el-image>
@@ -82,14 +82,14 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="姓名" prop="reportName">
+        <el-form-item label="标题" prop="reportName">
           <el-input v-model="temp.reportName" placeholder="请输入申报人员姓名"></el-input>
         </el-form-item>
         <el-form-item label="单位" prop="company">
-          <el-input v-model="temp.company" placeholder="请输入单位名称"></el-input>
+          <el-input v-model="temp.reportCompany" placeholder="请输入单位名称"></el-input>
         </el-form-item>
         <el-form-item label="部门" prop="department">
-          <el-input v-model="temp.department" placeholder="请输入部门名称"></el-input>
+          <el-input v-model="temp.reportDepartment" placeholder="请输入部门名称"></el-input>
         </el-form-item>
         <el-form-item label="照片">
           <el-upload
@@ -98,7 +98,7 @@
             :before-remove="beforeRemovePicture"
             :on-success="handlerSuccessPicture"
             :on-error="handlerErrorPicture"
-            action="http://localhost:9528/dev-api/api/upload"
+            action="http://139.224.135.165:8080/assess/report/addreportphoto"
             list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -109,7 +109,7 @@
         <el-form-item label="附件">
           <el-upload
             class="upload-demo"
-            action="http://localhost:9528/dev-api/api/upload"
+            action="http://139.224.135.165:8080/assess/report/addreportphoto"
             :on-remove="handleRemoveFile"
             :before-remove="beforeRemoveFile"
             :on-success="handlerSuccessFile"
@@ -178,10 +178,9 @@ export default {
       temp: {
         reportId: undefined,
         prizeKind: undefined,
-        prizeName: undefined,
-        reportPhotos: [],
+        reportphotos: [],
         reportInfo: undefined,
-        annex: []
+        reportdocuments: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -192,9 +191,8 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+        reportName: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
         ],
         company: [
           { required: true, message: '请输入单位名称', trigger: 'blur' }
@@ -274,8 +272,8 @@ export default {
     handleUpdate(row) {
       console.log(row)
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.reportPhotos.splice(0, this.temp.reportPhotos.length)
-      this.temp.annex.splice(0, this.temp.annex.length)
+      this.temp.reportphotos.splice(0, this.temp.reportphotos.length)
+      this.temp.reportdocuments.splice(0, this.temp.reportdocuments.length)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -293,10 +291,10 @@ export default {
       // this.list.splice(index, 1)
     },
     handlerSuccessFile(response, file, fileList) {
-      console.log(file, fileList)
-      this.temp.annex.push({
-        url: response.data.url,
-        name: file.name
+      // console.log(file, fileList)
+      this.temp.reportdocuments.push({
+        documentUrl: response.data.url,
+        documentName: file.name
       })
     },
     handlerErrorFile(err, file, fileList) {
@@ -304,13 +302,11 @@ export default {
       this.$message.error('上传附件失败，请刷新重试')
     },
     handleRemoveFile(file, fileList) {
-      console.log(file, fileList)
-      console.log(this.temp)
-      let FileIndex = this.temp.annex.findIndex(elem => {
-        elem.name === file.name
+      const FileIndex = this.temp.reportdocuments.findIndex(elem => {
+        elem.documentName === file.name
       })
-      this.temp.annex.splice(FileIndex, 1)
-      console.log(this.temp.annex)
+      this.temp.reportdocuments.splice(FileIndex, 1)
+      console.log(this.temp.reportdocuments)
     },
     handleExceedFile(files, fileList) {
       this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
@@ -320,21 +316,22 @@ export default {
     },
     handlerSuccessPicture(response, file, fileList) {
       console.log(file, fileList)
-      this.temp.reportPhotos.push({
-        url: response.data.url
+      this.temp.reportphotos.push({
+        name: file.name,
+        photoUrl: response.data.url
       })
     },
     handlerErrorPicture(err, file, fileList) {
-      console.log(err, file, fileList)
+      // console.log(err, file, fileList)
       this.$message.error('上传图片失败，请刷新重试')
     },
     handleRemovePicture(file, fileList) {
-      console.log(file,fileList)
-      let PictureIndex = this.temp.reportPhotos.findIndex(elem => {
+      console.log(file, fileList)
+      const PictureIndex = this.temp.reportphotos.findIndex(elem => {
         elem.name === file.name
       })
-      this.temp.reportPhotos.splice(PictureIndex, 1)
-      console.log(this.temp.reportPhotos)
+      this.temp.reportphotos.splice(PictureIndex, 1)
+      // console.log(this.temp.reportPhotos)
     },
     beforeRemovePicture(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
