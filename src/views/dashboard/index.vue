@@ -302,9 +302,11 @@ export default {
       this.$message.error('上传附件失败，请刷新重试')
     },
     handleRemoveFile(file, fileList) {
+      console.log('hello')
       const FileIndex = this.temp.reportdocuments.findIndex(elem => {
-        elem.documentName === file.name
+        elem.documentName == file.name
       })
+      console.log(FileIndex)
       this.temp.reportdocuments.splice(FileIndex, 1)
       console.log(this.temp.reportdocuments)
     },
