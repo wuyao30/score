@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="listQuery.prizeName" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
-        <el-option v-for="item in prizeNameOptions" :key="item.id" :label="item.specificCategoryName" :value="item.id" />
+      <el-select v-model="listQuery.prizeId" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
+        <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
@@ -18,7 +18,7 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" align="center" width="80">
+      <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.reportId }}</span>
         </template>
@@ -30,26 +30,26 @@
       </el-table-column>
       <el-table-column label="标题" width="110" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.title }}</span>
+          <span>{{ row.reportName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="单位" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.company }}</span>
+          <span>{{ row.reportCompany }}</span>
         </template>
       </el-table-column>
       <el-table-column label="部门" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.department }}</span>
+          <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
       <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-image
             style="width: 100px; height: 100px"
-            :src="row.reportPhotos[0].url"
+            :src="row.reportphotos[0].photoUrl"
             :preview-src-list="row.reportPhotos.map(function(elem) {
-              return elem.url
+              return elem.photoUrl
             })">
           </el-image>
         </template>
@@ -61,8 +61,8 @@
       </el-table-column>
       <el-table-column label="附件" width="120px" align="center">
         <template slot-scope="{row}">
-          <div v-for="(item, index) in row.annex" :key="index">
-            <el-link :href="item.url" type="success">{{`附件${index+1}`}}</el-link>
+          <div v-for="(item, index) in row.reportdocuments" :key="index">
+            <el-link :href="item.documentUrl" type="success">{{ item.documentName }}</el-link>
           </div>
         </template>
       </el-table-column>
@@ -71,14 +71,14 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
+          <el-button size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="fetchAllMinePrize" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
@@ -134,9 +134,9 @@
 </template>
 
 <script>
-import { updateReport, getMyAllPrizes, getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
+import { updateReport, getMyAllPrizes, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
+// import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
@@ -162,14 +162,13 @@ export default {
       fileList: [],
       prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
       tableKey: 0,
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
-        prizeKind: undefined,
-        prizeName: undefined,
+        pageNum: 1,
+        pageSize: 20,
+        prizeId: undefined,
         sort: '+id'
       },
       importanceOptions: [1, 2, 3],
@@ -238,7 +237,7 @@ export default {
     },
     fetchPrizesName() {
       getSpecificPrizeKind().then(response => {
-        this.prizeNameOptions = response.data.specificCategory
+        this.prizeNameOptions = response.data
         // console.log(this.prizeNameOptions)
       })
     },
@@ -246,9 +245,9 @@ export default {
       this.listLoading = true
       getMyAllPrizes(this.listQuery).then(response => {
         // console.log(response)
-        this.list = response.data.myPrizes
+        this.list = response.data.list
         console.log(this.list)
-        this.total = response.data.myPrizes.length
+        this.total = response.data.list.length
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -256,8 +255,7 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.fetchAllMinePrize()
+      this.fetchAllMinePrize(this.listQuery)
     },
     sortChange(data) {
       const { prop, order } = data

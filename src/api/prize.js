@@ -15,10 +15,11 @@ export function queryChartData() {
   })
 }
 
-export function getMyAllPrizes() {
+export function getMyAllPrizes(data) {
   return request({
-    url: '/api/mineAllPrize',
-    method: 'get'
+    url: '/report/getmyallreport',
+    method: 'post',
+    data
   })
 }
 
@@ -31,7 +32,7 @@ export function getMainPrizeKind() {
 
 export function getSpecificPrizeKind() {
   return request({
-    url: '/api/spec',
+    url: '/prize/getprizename',
     method: 'get'
   })
 }

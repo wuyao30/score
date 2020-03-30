@@ -1,6 +1,6 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import router, { resetRouter } from '@/router'
+import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
@@ -35,8 +35,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data)
+        setToken(data)
         resolve()
       }).catch(error => {
         reject(error)
@@ -54,13 +54,13 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { name, roles } = data
+        const { userInfo, roles } = data
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
 
-        commit('SET_NAME', name)
+        commit('SET_NAME', userInfo.name)
         commit('SET_ROLES', roles)
         resolve(data)
       }).catch(error => {

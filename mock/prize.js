@@ -48,7 +48,7 @@ const myPrizes = [
     prizeName: 'member excellent awards',
     reportPhotos: [
       {
-      url: 'http://139.224.135.165:8080/download/2.jpg'
+        url: 'http://139.224.135.165:8080/download/2.jpg'
       },
       {
         url: 'http://139.224.135.165:8080/download/3.jpg'

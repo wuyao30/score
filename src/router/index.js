@@ -56,12 +56,10 @@ export const constantRoutes = [
         icon: 'tongji'
       }
     }]
-  },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 
-export const asyncRoutes =  [
+export const asyncRoutes = [
   {
     path: '/mineinfo',
     component: Layout,
@@ -69,7 +67,7 @@ export const asyncRoutes =  [
     meta: {
       title: 'mineinfo',
       icon: 'lock',
-      roles: ['editor'] // you can set roles in root nav
+      roles: ['applyer'] // you can set roles in root nav
     },
     children: [{
       path: 'infoIndex',
@@ -78,7 +76,7 @@ export const asyncRoutes =  [
       meta: {
         title: '个人申报情况',
         icon: 'dashboard',
-        roles: ['editor']
+        roles: ['applyer']
       }
     }]
   },
@@ -90,7 +88,7 @@ export const asyncRoutes =  [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: '申报明细填写', icon: 'form', roles: ['editor'] }
+        meta: { title: '申报明细填写', icon: 'form', roles: ['applyer'] }
       }
     ]
   },
@@ -136,7 +134,7 @@ export const asyncRoutes =  [
         path: 'index',
         name: 'scoreIndex',
         component: () => import('@/views/score/index'),
-        meta: { title: '评优评先', icon: 'pingjia', roles: ['evaluator'] }
+        meta: { title: '评优评先', icon: 'pingjia', roles: ['maker'] }
       }
     ]
   },
@@ -175,10 +173,12 @@ export const asyncRoutes =  [
         path: 'mineIndex',
         name: 'mineIndex',
         component: () => import('@/views/mine/index'),
-        meta: { title: '我的', icon: 'wode', roles: ['editor'] }
+        meta: { title: '我的', icon: 'wode', roles: ['applyer'] }
       }
     ]
-  }
+  },
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
