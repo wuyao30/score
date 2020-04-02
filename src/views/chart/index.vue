@@ -7,7 +7,7 @@
 <script>
 import Chart from '@/components/Charts/MixChart'
 export default {
-  name: "index",
+  name: 'Index',
   components: { Chart }
 }
 </script>

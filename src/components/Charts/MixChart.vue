@@ -5,7 +5,7 @@
 <script>
 import echarts from 'echarts'
 import resize from './mixins/resize'
-import { queryChartData } from "../../api/prize"
+import { queryChartData } from '../../api/prize'
 
 export default {
 

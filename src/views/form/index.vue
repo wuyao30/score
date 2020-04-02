@@ -1,18 +1,18 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-      <el-form-item label="标题" prop="name">
-        <el-input v-model="form.name" width="80" />
+      <el-form-item label="标题" prop="reportName">
+        <el-input v-model="form.reportName" width="80" />
       </el-form-item>
-      <el-form-item label="单位" prop="company">
-        <el-input v-model="form.company" width="80" />
+      <el-form-item label="单位" prop="reportCompany">
+        <el-input v-model="form.reportCompany" width="80" />
       </el-form-item>
-      <el-form-item label="部门" prop="department">
-        <el-input v-model="form.department" width="80" />
+      <el-form-item label="部门" prop="reportDepartment">
+        <el-input v-model="form.reportDepartment" width="80" />
       </el-form-item>
       <el-form-item label="奖项名称" prop="prizeId">
         <el-select v-model="form.prizeId" placeholder="请选择奖项名称">
-          <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.specificCategoryName" :value="item.id" :disabled="item.disabled" />
+          <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
         </el-select>
       </el-form-item>
       <el-form-item label="照片">
@@ -22,7 +22,7 @@
           :before-remove="beforeRemovePicture"
           :on-success="handlerSuccessPicture"
           :on-error="handlerErrorPicture"
-          action="http://localhost:9528/dev-api/api/upload"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
           list-type="picture">
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
@@ -33,7 +33,7 @@
       <el-form-item label="附件">
         <el-upload
           class="upload-demo"
-          action="http://localhost:9528/dev-api/api/upload"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
           :on-remove="handleRemoveFile"
           :before-remove="beforeRemoveFile"
           :on-success="handlerSuccessFile"
@@ -53,46 +53,37 @@
 </template>
 
 <script>
-import { getMainPrizeKind, getSpecificPrizeKind } from '../../api/prize'
+import { getSpecificPrizeKind, uploadReport } from '../../api/prize'
 
 export default {
   data() {
     return {
-      prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类', disabled: true }],
+      prizeNameOptions: [],
       form: {
-        name: '',
-        company: '',
-        department: '',
+        reportName: '',
+        reportCompany: '',
+        reportDepartment: '',
         prizeId: undefined,
         reportInfo: '',
-        formPictures: [],
-        formFiles: []
+        reportphotos: [],
+        reportdocuments: []
       },
       rules: {
-        name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+        reportName: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
         ],
-        company: [
+        reportCompany: [
           { required: true, message: '请输入单位名称', trigger: 'blur' }
         ],
-        department: [
+        reportDepartment: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
         ],
-        specId: [
+        prizeId: [
           { required: true, message: '请选择具体奖项', trigger: 'change' }
         ],
         reportInfo: [
           { required: true, message: '请输入简介信息', trigger: 'blur' }
         ]
-      },
-      temp: {
-        reportId: undefined,
-        prizeKind: undefined,
-        prizeName: undefined,
-        reportPhotos: [],
-        reportInfo: undefined,
-        annex: []
       }
     }
   },
@@ -103,10 +94,14 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
-          console.log(this.form)
+          uploadReport(this.form).then(response => {
+            if (response.errno == 20000) {
+              this.$message.success('upload success')
+            } else {
+              this.$message.warning('upload failure')
+            }
+          })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -116,13 +111,13 @@ export default {
     },
     fetchPrizesNames() {
       getSpecificPrizeKind().then(response => {
-        this.prizeNameOptions = response.data.specificCategory
+        this.prizeNameOptions = response.data
       })
     },
     handlerSuccessFile(response, file, fileList) {
-      this.form.formFiles.push({
-        url: response.data.url,
-        name: file.name
+      this.form.reportdocuments.push({
+        documentUrl: response.data.url,
+        documentName: file.name
       })
     },
     handlerErrorFile(err, file, fileList) {
@@ -130,13 +125,12 @@ export default {
       this.$message.error('上传附件失败，请刷新重试')
     },
     handleRemoveFile(file, fileList) {
-      let FileIndex = this.form.formFiles.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.reportdocuments.filter((elem, index) => {
+        if (elem.documentName == file.name) {
           return index
         }
       })
-      this.form.formFiles.splice(FileIndex, 1)
-      console.log(this.form.formFiles)
+      this.form.reportdocuments.splice(FileIndex, 1)
     },
     handleExceedFile(files, fileList) {
       this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
@@ -145,36 +139,22 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handlerSuccessPicture(response, file, fileList) {
-      console.log(file, fileList)
-      this.form.formPictures.push({
-        url: response.data.url,
+      this.form.reportphotos.push({
+        photoUrl: response.data.url,
         name: file.name
       })
-      console.log(this.form.formPictures)
-    },
-    handlerSuccessPicture(response, file, fileList) {
-      console.log(file, fileList)
-      this.form.formPictures.push({
-        url: response.data.url,
-        name: file.name
-      })
-      console.log(this.form.formPictures)
     },
     handlerErrorPicture(err, file, fileList) {
       console.log(err, file, fileList)
       this.$message.error('上传图片失败，请刷新重试')
     },
     handleRemovePicture(file, fileList) {
-      console.log(file)
-      console.log(this.form.formPictures)
-      let PictureIndex = this.form.formPictures.filter((elem, index) => {
+      let PictureIndex = this.form.reportphotos.filter((elem, index) => {
         if (elem.name == file.name) {
           return index
         }
       })
-      console.log(PictureIndex)
-      this.form.formPictures.splice(PictureIndex, 1)
-      console.log(this.form.formPictures)
+      this.form.reportphotos.splice(PictureIndex, 1)
     },
     beforeRemovePicture(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)

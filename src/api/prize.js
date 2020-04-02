@@ -1,16 +1,8 @@
 import request from '@/utils/request'
 
-export function getAllPrize(data) {
-  return request({
-    url: '/api/allPrize',
-    method: 'get',
-    params: data
-  })
-}
-
 export function queryChartData() {
   return request({
-    url: '/prize/chart',
+    url: '/prize/allreportnums',
     method: 'get'
   })
 }
@@ -39,7 +31,7 @@ export function getSpecificPrizeKind() {
 
 export function updateReport(data) {
   return request({
-    url: '/api/updateReport',
+    url: '/report/updateonereport',
     method: 'post',
     data
   })
@@ -69,6 +61,29 @@ export function queryEvaluationPrizeInfo() {
 export function getAllPrizeNames() {
   return request({
     url: '/prize/all',
+    method: 'get'
+  })
+}
+
+export function deleteReport(data) {
+  return request({
+    url: '/report/delonereport',
+    method: 'post',
+    data
+  })
+}
+
+export function uploadReport(data) {
+  return request({
+    url: '/report/addreportrecord',
+    method: 'post',
+    data
+  })
+}
+
+export function queryReportDepartment() {
+  return request({
+    url: '/user/getcompanys',
     method: 'get'
   })
 }

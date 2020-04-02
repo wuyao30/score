@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.phone" placeholder="搜索姓名手机号" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.telephone" placeholder="搜索姓名手机号" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.name" placeholder="搜索姓名" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.department" placeholder="搜索单位" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in companyOptions" :key="item.key" :label="item.label" :value="item.key" />
+      <el-select v-model="listQuery.company" placeholder="搜索单位" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @change="handleFilter">
+        <el-option v-for="(item, index) in companyOptions" :key="index" :label="item" :value="item" />
       </el-select>
       <el-button v-waves class="filter-item" style="margin-right: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -32,12 +32,12 @@
     >
       <el-table-column label="id" prop="id" sortable align="center" width="70">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.userId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="登录名" align="center" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span>{{ scope.row.loginName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="密码" align="center" width="150">
@@ -52,7 +52,7 @@
       </el-table-column>
       <el-table-column label="手机号" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.telephone }}</span>
         </template>
       </el-table-column>
       <el-table-column label="单位" align="center" width="200">
@@ -70,29 +70,29 @@
           <el-button v-waves type="primary" icon="el-icon-setting" size="mini" @click="confirmUpdatePsw(row)">
             重置密码
           </el-button>
-          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="confirmUpdatePsw(row)">
+          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(row)">
             删除
           </el-button>
         </template>
       </el-table-column>
       <el-table-column label="登录权限" align="center" class-name="small-padding" width="120">
         <template slot-scope="{row}">
-          <el-button v-waves v-if="row.repStatus=='1'" size="mini" icon="el-icon-success" type="success" style="margin: 2px auto;" @click="handleModifyStatus(row,'0')">
+          <el-button v-waves v-if="row.enableFlage=='1'" size="mini" icon="el-icon-success" type="success" style="margin: 2px auto;" @click="handleModifyStatus(row,'0')">
             启用状态
           </el-button>
-          <el-button v-waves v-if="row.repStatus=='0'" size="mini" icon="el-icon-error" type="warning" style="margin: 2px auto;" @click="handleModifyStatus(row,'1')">
+          <el-button v-waves v-if="row.enableFlage=='0'" size="mini" icon="el-icon-error" type="warning" style="margin: 2px auto;" @click="handleModifyStatus(row,'1')">
             禁用状态
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList"/>
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter"/>
 
     <el-dialog :visible.sync="dialogFormVisible" title="添加">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="登录名" prop="username">
-          <el-input v-model="temp.username" />
+        <el-form-item label="登录名" prop="loginName">
+          <el-input v-model="temp.loginName" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
@@ -100,8 +100,8 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="temp.phone" />
+        <el-form-item label="手机号" prop="telephone">
+          <el-input v-model="temp.telephone" />
         </el-form-item>
         <el-form-item label="单位" prop="company">
           <el-input v-model="temp.company" />
@@ -114,7 +114,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="createData">
+        <el-button type="primary" @click="submitUser">
           确认添加
         </el-button>
       </div>
@@ -129,9 +129,10 @@
 </template>
 
 <script>
-import { getReportersInfo } from '../../../api/person'
+import { queryReportDepartment } from '../../../api/prize'
+import { modifyUserStatus, getReportersInfo, queryAllReporter, submitReporter, updateReportPassword, deleteReporter } from '../../../api/person'
 import waves from '@/directive/waves' // Waves directive
-import { parseTime } from '@/utils'
+// import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import BackToTop from '@/components/BackToTop'
 
@@ -146,25 +147,24 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
+        pageNum: 1,
+        pageSize: 20,
         name: undefined,
-        phone: undefined,
-        company: undefined,
-        department: undefined
+        telephone: undefined,
+        company: undefined
       },
-      companyOptions: [{ label: '大屯煤电团支部', key: '1' }, { label: '姚庄煤矿团委', key: '2' }],
+      companyOptions: [],
       temp: {
-        name: undefined,
+        loginName: undefined,
         username: undefined,
         password: undefined,
-        phone: undefined,
+        telephone: undefined,
         company: undefined,
         department: undefined
       },
       dialogFormVisible: false,
       rules: {
-        username: [
+        loginName: [
           { required: true, message: '登陆账号为必填项', trigger: 'blur' }
         ],
         password: [
@@ -172,7 +172,7 @@ export default {
         ],
         name: [
           { required: true, message: '姓名为必填项', trigger: 'blur' }],
-        phone: [{ required: true, message: '手机号码为必填项', trigger: 'blur' }],
+        telephone: [{ required: true, message: '手机号码为必填项', trigger: 'blur' }],
         company: [{ required: true, message: '单位为必填项', trigger: 'blur' }],
         department: [{ required: true, message: '部门为必填项', trigger: 'blur' }]
       },
@@ -190,11 +190,69 @@ export default {
   },
   created() {
     this.getList()
+    queryReportDepartment().then(response => {
+      if (response.errno == 20000) {
+        this.companyOptions = response.data
+      } else {
+        this.$message.warning('请求申报人员单位出错，请刷新')
+      }
+    })
   },
   methods: {
+    templateResponse(response) {
+      if (response.errno == 20000) {
+        this.$notify.success({
+          title: '成功',
+          message: response.data
+        })
+      } else {
+        this.$notify.error({
+          title: '失败',
+          message: '重置密码失败，请刷新重试'
+        })
+      }
+    },
+    confirmUpdatePsw(row) {
+      updateReportPassword({ userId: row.userId }).then(response => {
+        this.templateResponse(response)
+        this.handleFilter()
+      })
+    },
+    deleteUser(row) {
+      deleteReporter({ userId: row.userId }).then(response => {
+        this.templateResponse(response)
+        this.handleFilter()
+      })
+    },
+    handleModifyStatus(row, status) {
+      modifyUserStatus({ userId: row.userId, enableFlage: status }).then(response => {
+        this.templateResponse(response)
+        this.handleFilter()
+      })
+    },
+    submitUser() {
+      submitReporter(this.temp).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('添加申报人员账号成功')
+          this.dialogFormVisible = false
+          this.handleFilter()
+        } else {
+          this.$message.warning('添加申报人员账号失败，请重试')
+          this.dialogFormVisible = false
+          this.handleFilter()
+        }
+      })
+    },
     getList() {
-      getReportersInfo().then(response => {
-        this.list = response.data.reportersInfo
+      getReportersInfo(this.listQuery).then(response => {
+        this.list = response.data.list
+        this.total = response.data.total
+        this.listLoading = false
+      })
+    },
+    handleFilter() {
+      getReportersInfo(this.listQuery).then(response => {
+        this.list = response.data.list
         this.total = response.data.total
         this.listLoading = false
       })
@@ -205,18 +263,11 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.repStatus = status
-    },
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['id', '登录名', '密码', '姓名', '手机号', '单位', '部门', '状态']
-        const filterVal = ['id', 'username', 'password', 'name', 'phone', 'company', 'department', 'repStatus']
+        const filterVal = ['userId', 'loginName', 'password', 'name', 'telephone', 'company', 'department', 'enableFlage']
         const data = this.formatJson(filterVal, this.list)
         excel.export_json_to_excel({
           header: tHeader,
@@ -228,39 +279,29 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'stuCreateTime' || j === 'stuLastLoginTime') {
-          if (v[j] !== null) {
-            return parseTime(v[j])
-          } else {
-            return '暂无最近登录记录'
-          }
-        } else if (j === 'stuStatus') {
-          return v[j] === '1' ? '启用状态' : '禁用状态'
-        } else if (j === 'stuEmail') {
-          return v[j] || '暂无绑定邮箱'
-        } else if (j === 'stuPhone') {
-          return v[j] || '暂无绑定手机号'
+        if (j === 'enableFlage') {
+          return v[j] == 1 ? '启用状态' : '禁用状态'
         } else {
           return v[j]
         }
       }))
-    }
-    /*  async handleDownloadAll() {
+    },
+    async handleDownloadAll() {
       this.downloadLoading = true
-      let result = await reqGetStudentsList()
-      let list = result.data
+      let result = await queryAllReporter()
+      let list = result.data.users
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['学号', '姓名', '性别', '邮箱', '手机号', '注册时间', '最近登录时间', '登录权限']
-        const filterVal = ['sno', 'stuName', 'stuSex', 'stuEmail', 'stuPhone', 'stuCreateTime', 'stuLastLoginTime', 'stuStatus']
+        const tHeader = ['id', '登录名', '密码', '姓名', '手机号', '单位', '部门', '状态']
+        const filterVal = ['userId', 'loginName', 'password', 'name', 'telephone', 'company', 'department', 'enableFlage']
         const data = this.formatJson(filterVal, list)
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '全部学生信息表'
+          filename: '全部申报人员信息表'
         })
         this.downloadLoading = false
       })
-    }*/
+    }
   }
 }
 </script>

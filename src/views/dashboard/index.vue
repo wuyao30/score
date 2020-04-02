@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import { updateReport, getMyAllPrizes, getSpecificPrizeKind } from '../../api/prize'
+import { updateReport, getMyAllPrizes, getSpecificPrizeKind, deleteReport } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 // import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -155,9 +155,7 @@ export default {
   },
   data() {
     return {
-      pictureArray: [
-        'http://139.224.135.165:8080/download/3.jpg',
-        'http://139.224.135.165:8080/download/2.jpg'],
+      pictureArray: [],
       fileListPicture: [],
       fileList: [],
       prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
@@ -218,7 +216,7 @@ export default {
     handleSubmit() {
       console.log(this.temp)
       updateReport(this.temp).then(response => {
-        if (response.data === 'success') {
+        if (response.errno == 20000 ) {
           this.$message({
             message: '修改申报明细成功',
             type: 'success'
@@ -282,13 +280,24 @@ export default {
     },
     handleDelete(row, index) {
       console.log(row, index)
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+      deleteReport({ reportId: row.reportId }).then(response => {
+        if (response.errno == 20000) {
+          this.$notify({
+            title: 'Success',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify({
+            title: 'failure',
+            message: '删除失败',
+            type: 'warning',
+            duration: 2000
+          })
+        }
       })
-      // this.list.splice(index, 1)
+      this.fetchAllMinePrize()
     },
     handlerSuccessFile(response, file, fileList) {
       // console.log(file, fileList)
@@ -303,10 +312,12 @@ export default {
     },
     handleRemoveFile(file, fileList) {
       console.log('hello')
-      const FileIndex = this.temp.reportdocuments.findIndex(elem => {
-        elem.documentName == file.name
+      const FileIndex = this.temp.reportdocuments.filter((elem, index) => {
+        if (elem.documentName == file.name) {
+          return index
+        }
       })
-      console.log(FileIndex)
+      // console.log(FileIndex)
       this.temp.reportdocuments.splice(FileIndex, 1)
       console.log(this.temp.reportdocuments)
     },
@@ -329,8 +340,10 @@ export default {
     },
     handleRemovePicture(file, fileList) {
       console.log(file, fileList)
-      const PictureIndex = this.temp.reportphotos.findIndex(elem => {
-        elem.name === file.name
+      const PictureIndex = this.temp.reportphotos.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
       })
       this.temp.reportphotos.splice(PictureIndex, 1)
       // console.log(this.temp.reportPhotos)
