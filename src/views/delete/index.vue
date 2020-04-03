@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="listQuery.prizeName" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
-        <el-option v-for="item in prizeNameOptions" :key="item.id" :label="item.specificCategoryName" :value="item.id" />
+      <el-select v-model="listQuery.prizeId" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
+        <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
@@ -30,26 +30,26 @@
       </el-table-column>
       <el-table-column label="标题" width="110" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.title }}</span>
+          <span>{{ row.reportName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="单位" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.company }}</span>
+          <span>{{ row.reportCompany }}</span>
         </template>
       </el-table-column>
       <el-table-column label="部门" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.department }}</span>
+          <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
       <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-image
             style="width: 100px; height: 100px"
-            :src="row.reportPhotos[0].url"
-            :preview-src-list="row.reportPhotos.map(function(elem) {
-              return elem.url
+            :src="row.reportphotos[0].photoUrl"
+            :preview-src-list="row.reportphotos.map(function(elem) {
+              return elem.photoUrl
             })">
           </el-image>
         </template>
@@ -61,8 +61,8 @@
       </el-table-column>
       <el-table-column label="附件" width="120px" align="center">
         <template slot-scope="{row}">
-          <div v-for="(item, index) in row.annex" :key="index">
-            <el-link :href="item.url" type="success">{{`附件${index+1}`}}</el-link>
+          <div v-for="(item, index) in row.reportdocuments" :key="index">
+            <el-link :href="item.documentUrl" type="success">{{item.documentName}}</el-link>
           </div>
         </template>
       </el-table-column>
@@ -71,30 +71,30 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-waves v-if="row.status=='1'" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,'0')">
-            启用状态
+          <el-button v-waves v-if="row.reportWord=='1'" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,'0')">
+            准予考评
           </el-button>
-          <el-button v-waves v-if="row.status=='0'" size="mini" icon="el-icon-error" type="danger" @click="handleModifyStatus(row,'1')">
-            禁用状态
+          <el-button v-waves v-if="row.reportWord=='0'" size="mini" icon="el-icon-error" type="danger" @click="handleModifyStatus(row,'1')">
+            禁用考评
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="fetchAllMinePrize" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="姓名" prop="reportName">
+        <el-form-item label="标题" prop="reportName">
           <el-input v-model="temp.reportName" placeholder="请输入申报人员姓名"></el-input>
         </el-form-item>
         <el-form-item label="单位" prop="company">
-          <el-input v-model="temp.company" placeholder="请输入单位名称"></el-input>
+          <el-input v-model="temp.reportCompany" placeholder="请输入单位名称"></el-input>
         </el-form-item>
         <el-form-item label="部门" prop="department">
-          <el-input v-model="temp.department" placeholder="请输入部门名称"></el-input>
+          <el-input v-model="temp.reportDepartment" placeholder="请输入部门名称"></el-input>
         </el-form-item>
-        <el-form-item label="照片">
+        <!--<el-form-item label="照片">
           <el-upload
             class="upload-demo"
             :on-remove="handleRemovePicture"
@@ -105,11 +105,11 @@
             list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="简介" prop="reportInfo">
           <el-input v-model="temp.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="Please input" />
         </el-form-item>
-        <el-form-item label="附件">
+       <!-- <el-form-item label="附件">
           <el-upload
             class="upload-demo"
             action="http://localhost:9528/dev-api/api/upload"
@@ -122,7 +122,7 @@
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
-        </el-form-item>
+        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -141,9 +141,8 @@
 </template>
 
 <script>
-import { updateReport, getMyAllPrizes, getSpecificPrizeKind } from '../../api/prize'
+import { adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
@@ -182,10 +181,9 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
-        prizeKind: undefined,
-        prizeName: undefined,
+        pageNum: 1,
+        pageSize: 20,
+        prizeId: undefined,
         sort: '+id'
       },
       importanceOptions: [1, 2, 3],
@@ -193,12 +191,6 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        reportId: undefined,
-        prizeKind: undefined,
-        prizeName: undefined,
-        reportPhotos: [],
-        reportInfo: undefined,
-        annex: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -209,18 +201,14 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
+        reportName: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
         ],
         company: [
           { required: true, message: '请输入单位名称', trigger: 'blur' }
         ],
         department: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
-        ],
-        specId: [
-          { required: true, message: '请选择具体奖项', trigger: 'change' }
         ],
         reportInfo: [
           { required: true, message: '请输入简介信息', trigger: 'blur' }
@@ -234,10 +222,19 @@ export default {
     this.fetchPrizesName()
   },
   methods: {
+    handleModifyStatus(row, status) {
+      adminUpdateReportStatus({ reportId: row.reportId, reportWord: status }).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('修改成功')
+        } else {
+          this.$message.error('修改失败，请重试')
+        }
+        setTimeout(this.fetchAllMinePrize(), 1000)
+      })
+    },
     handleSubmit() {
-      console.log(this.temp)
-      updateReport(this.temp).then(response => {
-        if (response.data === 'success') {
+      adminUpdateReport(this.temp).then(response => {
+        if (response.code == 20000) {
           this.$message({
             message: '修改申报明细成功',
             type: 'success'
@@ -250,30 +247,28 @@ export default {
         }
       })
       this.dialogFormVisible = false
-      this.fetchAllMinePrize()
+      this.handleFilter()
     },
     fetchPrizesName() {
       getSpecificPrizeKind().then(response => {
-        this.prizeNameOptions = response.data.specificCategory
+        this.prizeNameOptions = response.data
         // console.log(this.prizeNameOptions)
       })
     },
     fetchAllMinePrize() {
       this.listLoading = true
-      getMyAllPrizes(this.listQuery).then(response => {
-        // console.log(response)
-        this.list = response.data.myPrizes
-        console.log(this.list)
-        this.total = response.data.myPrizes.length
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+      adminGetModifyReport(this.listQuery).then(response => {
+        this.list = response.data.list
+        this.total = response.data.list.length
+        this.listLoading = false
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.fetchAllMinePrize()
+      adminGetReportById(this.listQuery).then(response => {
+        this.list = response.data.list
+        this.total = response.data.list.length
+        this.listLoading = false
+      })
     },
     sortChange(data) {
       const { prop, order } = data
@@ -292,8 +287,8 @@ export default {
     handleUpdate(row) {
       console.log(row)
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.reportPhotos.splice(0, this.temp.reportPhotos.length)
-      this.temp.annex.splice(0, this.temp.annex.length)
+      this.temp.reportphotos.splice(0, this.temp.reportphotos.length)
+      this.temp.reportdocuments.splice(0, this.temp.reportdocuments.length)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {

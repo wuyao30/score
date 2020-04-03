@@ -2,17 +2,17 @@
   <div class="app-container">
     <div class="card-wrapper">
       <el-card class="box-card" shadow="hover">
-        <div slot="header" class="clearfix">
+        <div slot="header" class="clearfix" style="text-align: left;">
           <span>评分规则</span>
         </div>
         <div class="text item">
-          {{ 打分规则 }}
+          评选奖项名称： {{ prize.prizeName }}
         </div>
         <div class="text item">
-          {{ 打分规则 }}
+          评选规则： {{ prize.prizeInfo }}
         </div>
         <div class="text item">
-          {{ 打分规则 }}
+          奖项数: {{ prize.prizeNum }}
         </div>
       </el-card>
     </div>
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { queryEvaluationPrizeInfo, submitEvaluateResult } from '../../api/prize'
+import { queryEvaluationPrizeInfo, submitEvaluateResult, evaluateGetPrizeInfo } from '../../api/prize'
 const STANDARDSCORE = 30
 const MAXSCORE = 40
 export default {
@@ -121,6 +121,9 @@ export default {
         return Object.assign(elem, score)
       })
       this.listLoading = false
+    })
+    evaluateGetPrizeInfo().then(response => {
+      this.prize = response.data
     })
   },
   methods: {
@@ -196,10 +199,12 @@ export default {
     margin-right: 20px;
   }
   .text {
+    text-align: left;
     font-size: 14px;
   }
 
   .item {
+    text-align: left;
     margin-bottom: 18px;
   }
 

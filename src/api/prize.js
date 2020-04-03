@@ -127,3 +127,58 @@ export function submitEvaluateResult(data) {
     data
   })
 }
+
+export function adminGetScore(data) {
+  return request({
+    url: '/report/getmarkresultsbyprizeidpage',
+    method: 'post',
+    data
+  })
+}
+
+export function adminGetScoreNoPagenite(data) {
+  return request({
+    url: '/report/getmarkresultbyprizeid',
+    method: 'post',
+    data
+  })
+}
+
+export function adminGetModifyReport(data) {
+  return request({
+    url: '/report/getallreportadmin',
+    method: 'post',
+    data
+  })
+}
+
+export function adminGetReportById(data) {
+  return request({
+    url: '/report/getallreportadminbyprizeid',
+    method: 'post',
+    data
+  })
+}
+
+export function adminUpdateReport(data) {
+  return request({
+    url: '/report/updateonereportbyadmin',
+    method: 'post',
+    data
+  })
+}
+
+export function evaluateGetPrizeInfo() {
+  return request({
+    url: '/report/getmymarkreportprizeinfo',
+    method: 'get'
+  })
+}
+
+export function adminUpdateReportStatus(data) {
+  return request({
+    url: '/report/updateonereportword',
+    method: 'post',
+    data
+  })
+}
