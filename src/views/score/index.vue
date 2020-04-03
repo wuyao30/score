@@ -1,5 +1,21 @@
 <template>
   <div class="app-container">
+    <div class="card-wrapper">
+      <el-card class="box-card" shadow="hover">
+        <div slot="header" class="clearfix">
+          <span>评分规则</span>
+        </div>
+        <div class="text item">
+          {{ 打分规则 }}
+        </div>
+        <div class="text item">
+          {{ 打分规则 }}
+        </div>
+        <div class="text item">
+          {{ 打分规则 }}
+        </div>
+      </el-card>
+    </div>
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -28,37 +44,37 @@
         <template slot-scope="{row}">
           <el-image
             style="width: 100px; height: 100px"
-            :src="row.reportPhotos[0].url"
-            :preview-src-list="row.reportPhotos.map(function(elem) {
-              return elem.url
+            :src="row.reportphotos[0].photoUrl"
+            :preview-src-list="row.reportphotos.map(function(elem) {
+              return elem.photoUrl
             })">
           </el-image>
         </template>
       </el-table-column>
       <el-table-column label="相关材料" align="center" width="80">
         <template slot-scope="{row}">
-          <div v-for="(item, index) in row.annex" :key="index">
-            <el-link :href="item.url" type="success">{{`附件${index+1}`}}</el-link>
+          <div v-for="(item, index) in row.reportdocuments" :key="index">
+            <el-link :href="item.documentUrl" type="success">{{item.documentName}}</el-link>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="综合评价" align="center">
-        <el-table-column label="政治素质" align="center">
+        <el-table-column label="政治素质(1-10分)" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.score1" placeholder="请输入分数"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="工作业绩" align="center">
+        <el-table-column label="工作业绩(1-10分)" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.score2" placeholder="请输入分数"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="业务能力" align="center">
+        <el-table-column label="业务能力(1-10分)" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.score3" placeholder="请输入分数"></el-input>
           </template>
         </el-table-column>
-        <el-table-column label="形象作风" align="center">
+        <el-table-column label="形象作风(1-10分)" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.score4" placeholder="请输入分数"></el-input>
           </template>
@@ -70,7 +86,6 @@
         </el-table-column>
       </el-table-column>
     </el-table>
-
     <div class="submit-container">
       <el-button type="primary" @click="submitForm">提交打分</el-button>
     </div>
@@ -78,8 +93,9 @@
 </template>
 
 <script>
-import { getMyAllPrizes, queryEvaluationPrizeInfo } from '../../api/prize'
+import { queryEvaluationPrizeInfo, submitEvaluateResult } from '../../api/prize'
 const STANDARDSCORE = 30
+const MAXSCORE = 40
 export default {
   name: 'Index',
   data() {
@@ -92,52 +108,72 @@ export default {
     }
   },
   created() {
-    this.fetchEvaluationPrize()
     queryEvaluationPrizeInfo().then(response => {
-      this.prize = response.data
+      this.templateMethod(response)
+      const score = {
+        score1: 0,
+        score2: 0,
+        score3: 0,
+        score4: 0,
+        totalScore: 0
+      }
+      this.list = response.data.map(function(elem) {
+        return Object.assign(elem, score)
+      })
+      this.listLoading = false
     })
   },
   methods: {
+    templateMethod(response) {
+      if (response.errno == 20000) {
+        this.$message.success('获取信息成功')
+      } else {
+        this.$message.error('获取信息失败')
+      }
+    },
     totalScore(scope) {
       scope.row.totalScore =  parseInt(scope.row.score1) + parseInt(scope.row.score2) + parseInt(scope.row.score3) + parseInt(scope.row.score4)
       return scope.row.totalScore
     },
-    fetchEvaluationPrize() {
-      getMyAllPrizes().then(response => {
-        this.listLoading = false
-        const score = {
-          score1: 0,
-          score2: 0,
-          score3: 0,
-          score4: 0,
-          totalScore: 0
-        }
-        this.list = response.data.myPrizes.map(function(elem) {
-          return Object.assign(elem, score)
-        })
-      })
-    },
     submitForm() {
-      const highScore = this.list.filter(function (elem) {
-        elem.totatScore > STANDARDSCORE
+      const highScore = this.list.filter(function(elem) {
+        MAXSCORE >= elem.totatScore >= STANDARDSCORE
       })
-      if( highScore > this.prize.winNum) {
+      if (highScore.length > this.prize.winNum) {
         this.$message({
           message: '打分结果大于标准要求数量',
           type: 'error'
         })
-      }else if ( highScore < this.prize.winNum ) {
+        return
+      } else if (highScore < this.prize.winNum) {
         this.$message({
           message: '打分结果小于标准要求数量',
           type: 'error'
         })
+        return
       } else {
-        this.$message({
-          message: '提交成功',
-          type: 'success'
+        const result = this.list.map(function(elem) {
+          let markScore = elem.totalScore
+          return {
+            prizeId: elem.prizeId,
+            reportId: elem.reportId,
+            markScore: markScore
+          }
+        })
+        submitEvaluateResult(result).then(response => {
+          if (response.errno == 20000) {
+            this.$notify.success({
+              title: '成功',
+              message: response.data
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '提交结果失败，请刷新重试'
+            })
+          }
         })
       }
-      console.log(this.list)
     }
   }
 }
@@ -147,9 +183,36 @@ export default {
   .app-container{
     padding-top: 15px;
   }
+  .card-wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0px auto 10px auto;
+  }
   .submit-container {
     text-align: right;
     margin-top: 10px;
     margin-right: 20px;
+  }
+  .text {
+    font-size: 14px;
+  }
+
+  .item {
+    margin-bottom: 18px;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: "";
+  }
+  .clearfix:after {
+    clear: both
+  }
+
+  .box-card {
+    width: 100%;
   }
 </style>

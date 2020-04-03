@@ -1,7 +1,10 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
-
+export function substrTime(time) {
+  time = time.substr(0, 10)
+  return time
+}
 /**
  * Parse the time to string
  * @param {(Object|string|number)} time
@@ -18,7 +21,8 @@ export function parseTime(time, cFormat) {
     date = time
   } else {
     if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
-      time = parseInt(time)
+      time = parseInt(time.substr(0, 10))
+      console.log(time)
     }
     if ((typeof time === 'number') && (time.toString().length === 10)) {
       time = time * 1000

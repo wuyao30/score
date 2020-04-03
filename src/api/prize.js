@@ -53,7 +53,7 @@ export function queryAllPrizes() {
 
 export function queryEvaluationPrizeInfo() {
   return request({
-    url: '/evaluation/prize',
+    url: '/report/getmymarkreport',
     method: 'get'
   })
 }
@@ -73,6 +73,22 @@ export function deleteReport(data) {
   })
 }
 
+export function adminUpdatePrize(data) {
+  return request({
+    url: '/prize/updateprizebyprize',
+    method: 'post',
+    data
+  })
+}
+
+export function adminInsertPrize(data) {
+  return request({
+    url: '/prize/add',
+    method: 'post',
+    data
+  })
+}
+
 export function uploadReport(data) {
   return request({
     url: '/report/addreportrecord',
@@ -85,5 +101,29 @@ export function queryReportDepartment() {
   return request({
     url: '/user/getcompanys',
     method: 'get'
+  })
+}
+
+export function adminPrizes(data) {
+  return request({
+    url: '/prize/allnums',
+    method: 'post',
+    data
+  })
+}
+
+export function adminDeletePrize(data) {
+  return request({
+    url: '/prize/delprize',
+    method: 'post',
+    data
+  })
+}
+
+export function submitEvaluateResult(data) {
+  return request({
+    url: '/mark/addmarkscore',
+    method: 'post',
+    data
   })
 }

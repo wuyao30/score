@@ -34,10 +34,15 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data)
-        setToken(data)
-        resolve()
+        if (response.errno == 60204) {
+          this.$message.error('登陆失败')
+          reject(response)
+        } else {
+          const { data } = response
+          commit('SET_TOKEN', data)
+          setToken(data)
+          resolve()
+        }
       }).catch(error => {
         reject(error)
       })

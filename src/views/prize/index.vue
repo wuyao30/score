@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="listQuery.prizeId" filterable placeholder="奖项名称" clearable style="width: 250px;margin-right: 8px" class="filter-item" @change="mainChange">
-        <el-option v-for="item in prizesOptions" :key="item.id" :label="item.specificCategoryName" :value="item.id" />
+      <el-select v-model="listQuery.prizeId" filterable placeholder="奖项名称" clearable style="width: 250px;margin-right: 8px" class="filter-item" >
+        <el-option v-for="item in prizesOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
@@ -21,34 +21,39 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
+      <el-table-column label="序号" width="80" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.$index + 1 }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="奖项名称" width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.prizeName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="开始时间" width="200" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.startDate }}</span>
+        <template slot-scope="{row}">
+          <span>{{ row.startDate }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" width="200" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.endDate }}</span>
+        <template slot-scope="{row}">
+          <span>{{ row.endDate }}</span>
         </template>
       </el-table-column>
       <el-table-column label="评选细则" width="350" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.selectRule }}</span>
+          <span>{{ scope.row.prizeInfo }}</span>
         </template>
       </el-table-column>
       <el-table-column label="申报人数" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.reportNum }}</span>
+          <span>{{ scope.row.reportCount }}</span>
         </template>
       </el-table-column>
       <el-table-column label="最终获奖数量" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.winNum }}</span>
+          <span>{{ scope.row.prizeNum }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
@@ -74,21 +79,27 @@
           <el-date-picker
             v-model="temp.startDate"
             type="date"
-            placeholder="选择日期">
+            placeholder="选择日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间" prop="startDate">
           <el-date-picker
             v-model="temp.endDate"
             type="date"
-            placeholder="选择日期">
+            placeholder="选择日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+          >
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="打分细则" prop="selectRule">
-          <el-input v-model="temp.selectRule" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入打分规则" />
+        <el-form-item label="打分细则" prop="prizeInfo">
+          <el-input v-model="temp.prizeInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入打分规则" />
         </el-form-item>
-        <el-form-item label="获奖数量" prop="winNum">
-          <el-input v-model.number="temp.winNum" placeholder="请输入获奖数量" />
+        <el-form-item label="获奖数量" prop="prizeNum">
+          <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -101,8 +112,8 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogUpdateFormVisible" :title="textMap[dialogStatus]">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+    <el-dialog :visible.sync="dialogInsertFormVisible" title="create">
+      <el-form ref="insertForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="奖项名称" prop="prizeName">
           <el-input v-model="temp.prizeName" placeholder="请输入奖项名称">
           </el-input>
@@ -111,47 +122,54 @@
           <el-date-picker
             v-model="temp.startDate"
             type="date"
-            placeholder="选择日期">
+            placeholder="选择日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="结束时间" prop="startDate">
           <el-date-picker
             v-model="temp.endDate"
             type="date"
-            placeholder="选择日期">
+            placeholder="选择日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+          >
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="打分细则" prop="selectRule">
-          <el-input v-model="temp.selectRule" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入打分规则" />
+        <el-form-item label="打分细则" prop="prizeInfo">
+          <el-input v-model="temp.prizeInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入打分规则" />
         </el-form-item>
-        <el-form-item label="获奖数量" prop="winNum">
-          <el-input v-model.number="temp.winNum" placeholder="请输入获奖数量" />
+        <el-form-item label="获奖数量" prop="prizeNum">
+          <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="dialogInsertFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="handleSubmit">
+        <el-button type="primary" @click="handleInsertSubmit">
           确认
         </el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { prizesDetail, queryAllPrizes } from '../../api/prize'
+import { adminInsertPrize, adminUpdatePrize, getSpecificPrizeKind, adminPrizes, adminDeletePrize } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
+
 export default {
   name: 'Index',
   components: { Pagination },
   data() {
     return {
-      dialogFormVisible: false,
       dialogInsertFormVisible: false,
+      dialogUpdateFormVisible: false,
+      dialogFormVisible: false,
       rules: {
         prizeName: [
           { required: true, message: '奖项名称为必填项', trigger: 'blur' }
@@ -162,18 +180,18 @@ export default {
         endDate: [
           { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
         ],
-        selectRule: [
+        prizeInfo: [
           { required: true, message: '评选细则为必填项', trigger: 'blur' }
         ],
-        winNum: [
+        prizeNum: [
           { required: true, message: '获奖数量不能为空' },
           { type: 'number', message: '获奖数量必须为数字值' }
         ]
       },
       temp: {
         prizeName: undefined,
-        startDate: '',
-        endDate: '',
+        startDate: undefined,
+        endDate: undefined,
         selectRule: '',
         winNum: undefined
       },
@@ -182,14 +200,12 @@ export default {
         update: '编辑',
         create: '创建'
       },
-      dialogFormVisible: false,
       tableKey: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
-        prizeKind: undefined,
-        prizeName: undefined,
+        pageNum: 1,
+        pageSize: 20,
+        prizeId: undefined,
         sort: '+id'
       },
       prizesOptions: [],
@@ -203,14 +219,33 @@ export default {
     this.fetchPrizesDetails()
   },
   methods: {
+    handleInsertSubmit() {
+      adminInsertPrize(this.temp).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('新增奖项成功')
+        } else {
+          this.$message.error('新增奖项失败，请重试')
+        }
+        this.dialogInsertFormVisible = false
+        this.handleFilter()
+      })
+    },
     handleSubmit() {
+      adminUpdatePrize(this.temp).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('修改奖项信息成功')
+        } else {
+          this.$message.warning('修改失败，请刷新重试')
+        }
+        this.dialogFormVisible = false
+        this.handleFilter()
+      })
     },
     handleCreate() {
-      this.dialogStatus = 'create'
       this.temp = {}
-      this.dialogFormVisible = true
+      this.dialogInsertFormVisible = true
       this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+        this.$refs['insertForm'].clearValidate()
       })
     },
     handleUpdate(row) {
@@ -223,24 +258,33 @@ export default {
       })
     },
     handleDelete(row) {
-      console.log(row)
+      adminDeletePrize({ prizeId: row.prizeId }).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('删除奖项成功')
+        } else {
+          this.$message.warning('删除奖项失败，请重试')
+        }
+        this.handleFilter()
+      })
     },
     fetchPrizesInfo() {
-      queryAllPrizes().then(response => {
-        this.prizesOptions = response.data.specificCategory
+      getSpecificPrizeKind().then(response => {
+        this.prizesOptions = response.data
       })
     },
     fetchPrizesDetails() {
-      prizesDetail().then(response => {
-        this.list = response.data
+      adminPrizes(this.listQuery).then(response => {
+        this.list = response.data.list
+        this.total = response.data.total
         this.listLoading = false
-        // console.log(this.list)
-        this.total = this.list.length
       })
     },
-    mainChange() {
-    },
     handleFilter() {
+      adminPrizes(this.listQuery).then(response => {
+        this.list = response.data.list
+        this.total = response.data.total
+        this.listLoading = false
+      })
     },
     sortChange(data) {
       const { prop, order } = data

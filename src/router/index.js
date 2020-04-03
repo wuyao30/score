@@ -36,13 +36,6 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
-
   {
     path: '/',
     component: Layout,
@@ -56,6 +49,11 @@ export const constantRoutes = [
         icon: 'tongji'
       }
     }]
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
   }
 ]
 
@@ -134,7 +132,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'scoreIndex',
         component: () => import('@/views/score/index'),
-        meta: { title: '评优评先', icon: 'pingjia', roles: ['maker'] }
+        meta: { title: '评优评先', icon: 'pingjia', roles: ['marker'] }
       }
     ]
   },
