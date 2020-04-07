@@ -140,15 +140,16 @@ export default {
     },
     submitForm() {
       const highScore = this.list.filter(function(elem) {
-        MAXSCORE >= elem.totatScore >= STANDARDSCORE
+        return elem.totalScore >= STANDARDSCORE && elem.totalScore <= MAXSCORE
       })
-      if (highScore.length > this.prize.winNum) {
+      console.log(MAXSCORE, highScore, STANDARDSCORE)
+      if (highScore.length > this.prize.prizeNum) {
         this.$message({
           message: '打分结果大于标准要求数量',
           type: 'error'
         })
         return
-      } else if (highScore < this.prize.winNum) {
+      } else if (highScore.length < this.prize.prizeNum) {
         this.$message({
           message: '打分结果小于标准要求数量',
           type: 'error'
