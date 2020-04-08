@@ -43,14 +43,14 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
-      component: () => import('@/views/chart/index'),
+      component: () => import('@/views/table/index'),
       meta: {
         title: '申报情况',
         icon: 'tongji'
       }
     }]
   },
-  {
+  /* {
     path: '/newChart',
     component: Layout,
     redirect: '/dashboard',
@@ -63,7 +63,7 @@ export const constantRoutes = [
         icon: 'tongji'
       }
     }]
-  },
+  },*/
   {
     path: '/404',
     component: () => import('@/views/404'),

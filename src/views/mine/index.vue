@@ -66,9 +66,24 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="200px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <span>{{ judgeScore }}</span>
+          <el-button v-waves v-if="row.reportWord=='1'" size="mini" icon="el-icon-success" type="success" >
+            准予考评
+          </el-button>
+          <el-button v-waves v-if="row.reportWord=='0'" size="mini" icon="el-icon-error" type="danger">
+            禁用考评
+          </el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="管理员留言" align="center" width="200px" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <span>{{ judgeMessage(row) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="得分" align="center" width="200px" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <span>{{ row.reportVideo.substr(0, 3) }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -129,234 +144,232 @@
 </template>
 
 <script>
-  import { updateReport, getMyAllPrizes, getSpecificPrizeKind, deleteReport } from '../../api/prize'
-  import waves from '@/directive/waves' // waves directive
-  // import { parseTime } from '@/utils'
-  import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { updateReport, getMyAllPrizes, getSpecificPrizeKind, deleteReport } from '../../api/prize'
+import waves from '@/directive/waves' // waves directive
+// import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-  export default {
-    name: 'Dashboard',
-    components: { Pagination },
-    directives: { waves },
-    filters: {
-      statusFilter(status) {
-        const statusMap = {
-          published: 'success',
-          draft: 'info',
-          deleted: 'danger'
-        }
-        return statusMap[status]
+export default {
+  name: 'Dashboard',
+  components: { Pagination },
+  directives: { waves },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
+    }
+  },
+  data() {
+    return {
+      pictureArray: [],
+      fileListPicture: [],
+      fileList: [],
+      prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
+      tableKey: 0,
+      list: [],
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 20,
+        prizeId: undefined,
+        sort: '+id'
+      },
+      importanceOptions: [1, 2, 3],
+      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
+      statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
+      temp: {
+        reportId: undefined,
+        prizeKind: undefined,
+        reportphotos: [],
+        reportInfo: undefined,
+        reportdocuments: []
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: 'Create'
+      },
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        reportName: [
+          { required: true, message: '请输入标题', trigger: 'blur' }
+        ],
+        company: [
+          { required: true, message: '请输入单位名称', trigger: 'blur' }
+        ],
+        department: [
+          { required: true, message: '请输入部门名称', trigger: 'blur' }
+        ],
+        specId: [
+          { required: true, message: '请选择具体奖项', trigger: 'change' }
+        ],
+        reportInfo: [
+          { required: true, message: '请输入简介信息', trigger: 'blur' }
+        ]
+      },
+      downloadLoading: false
+    }
+  },
+  created() {
+    this.fetchAllMinePrize()
+    this.fetchPrizesName()
+  },
+  methods: {
+    judgeMessage(row) {
+      if (row.reportPhoto1 == null) {
+        return '暂无留言'
+      } else {
+        return row.reportPhoto1
       }
     },
-    computed: {
-      judgeScore(row) {
-        if (row.reportVideo == null ){
-          return '暂无成绩'
+    handleSubmit() {
+      console.log(this.temp)
+      updateReport(this.temp).then(response => {
+        if (response.errno == 20000 ) {
+          this.$message({
+            message: '修改申报明细成功',
+            type: 'success'
+          })
         } else {
-          return row.reportVideo
+          this.$message({
+            message: '修改申报明细失败',
+            type: 'error'
+          })
         }
-      }
-    },
-    data() {
-      return {
-        pictureArray: [],
-        fileListPicture: [],
-        fileList: [],
-        prizeNameOptions: [{ id: -1, specificCategoryName: '请先选择奖项大类' }],
-        tableKey: 0,
-        list: [],
-        total: 0,
-        listLoading: true,
-        listQuery: {
-          pageNum: 1,
-          pageSize: 20,
-          prizeId: undefined,
-          sort: '+id'
-        },
-        importanceOptions: [1, 2, 3],
-        sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-        statusOptions: ['published', 'draft', 'deleted'],
-        showReviewer: false,
-        temp: {
-          reportId: undefined,
-          prizeKind: undefined,
-          reportphotos: [],
-          reportInfo: undefined,
-          reportdocuments: []
-        },
-        dialogFormVisible: false,
-        dialogStatus: '',
-        textMap: {
-          update: '编辑',
-          create: 'Create'
-        },
-        dialogPvVisible: false,
-        pvData: [],
-        rules: {
-          reportName: [
-            { required: true, message: '请输入标题', trigger: 'blur' }
-          ],
-          company: [
-            { required: true, message: '请输入单位名称', trigger: 'blur' }
-          ],
-          department: [
-            { required: true, message: '请输入部门名称', trigger: 'blur' }
-          ],
-          specId: [
-            { required: true, message: '请选择具体奖项', trigger: 'change' }
-          ],
-          reportInfo: [
-            { required: true, message: '请输入简介信息', trigger: 'blur' }
-          ]
-        },
-        downloadLoading: false
-      }
-    },
-    created() {
+      })
+      this.dialogFormVisible = false
       this.fetchAllMinePrize()
-      this.fetchPrizesName()
     },
-    methods: {
-      handleSubmit() {
-        console.log(this.temp)
-        updateReport(this.temp).then(response => {
-          if (response.errno == 20000 ) {
-            this.$message({
-              message: '修改申报明细成功',
-              type: 'success'
-            })
-          } else {
-            this.$message({
-              message: '修改申报明细失败',
-              type: 'error'
-            })
-          }
-        })
-        this.dialogFormVisible = false
-        this.fetchAllMinePrize()
-      },
-      fetchPrizesName() {
-        getSpecificPrizeKind().then(response => {
-          this.prizeNameOptions = response.data
-          // console.log(this.prizeNameOptions)
-        })
-      },
-      fetchAllMinePrize() {
-        this.listLoading = true
-        getMyAllPrizes(this.listQuery).then(response => {
-          // console.log(response)
-          this.list = response.data.list
-          console.log(this.list)
-          this.total = response.data.list.length
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
-        })
-      },
-      handleFilter() {
-        this.fetchAllMinePrize(this.listQuery)
-      },
-      sortChange(data) {
-        const { prop, order } = data
-        if (prop === 'id') {
-          this.sortByID(order)
-        }
-      },
-      sortByID(order) {
-        if (order === 'ascending') {
-          this.listQuery.sort = '+id'
-        } else {
-          this.listQuery.sort = '-id'
-        }
-        this.handleFilter()
-      },
-      handleUpdate(row) {
-        console.log(row)
-        this.temp = Object.assign({}, row) // copy obj
-        this.temp.reportphotos.splice(0, this.temp.reportphotos.length)
-        this.temp.reportdocuments.splice(0, this.temp.reportdocuments.length)
-        this.dialogStatus = 'update'
-        this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
-      },
-      handleDelete(row, index) {
-        console.log(row, index)
-        deleteReport({ reportId: row.reportId }).then(response => {
-          if (response.errno == 20000) {
-            this.$notify({
-              title: 'Success',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
-          } else {
-            this.$notify({
-              title: 'failure',
-              message: '删除失败',
-              type: 'warning',
-              duration: 2000
-            })
-          }
-        })
-        this.fetchAllMinePrize()
-      },
-      handlerSuccessFile(response, file, fileList) {
-        // console.log(file, fileList)
-        this.temp.reportdocuments.push({
-          documentUrl: response.data.url,
-          documentName: file.name
-        })
-      },
-      handlerErrorFile(err, file, fileList) {
-        console.log(err, file, fileList)
-        this.$message.error('上传附件失败，请刷新重试')
-      },
-      handleRemoveFile(file, fileList) {
-        console.log('hello')
-        const FileIndex = this.temp.reportdocuments.filter((elem, index) => {
-          if (elem.documentName == file.name) {
-            return index
-          }
-        })
-        // console.log(FileIndex)
-        this.temp.reportdocuments.splice(FileIndex, 1)
-        console.log(this.temp.reportdocuments)
-      },
-      handleExceedFile(files, fileList) {
-        this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
-      },
-      beforeRemoveFile(file, fileList) {
-        return this.$confirm(`确定移除 ${file.name}？`)
-      },
-      handlerSuccessPicture(response, file, fileList) {
-        console.log(file, fileList)
-        this.temp.reportphotos.push({
-          name: file.name,
-          photoUrl: response.data.url
-        })
-      },
-      handlerErrorPicture(err, file, fileList) {
-        // console.log(err, file, fileList)
-        this.$message.error('上传图片失败，请刷新重试')
-      },
-      handleRemovePicture(file, fileList) {
-        console.log(file, fileList)
-        const PictureIndex = this.temp.reportphotos.filter((elem, index) => {
-          if (elem.name == file.name) {
-            return index
-          }
-        })
-        this.temp.reportphotos.splice(PictureIndex, 1)
-        // console.log(this.temp.reportPhotos)
-      },
-      beforeRemovePicture(file, fileList) {
-        return this.$confirm(`确定移除 ${file.name}？`)
+    fetchPrizesName() {
+      getSpecificPrizeKind().then(response => {
+        this.prizeNameOptions = response.data
+        // console.log(this.prizeNameOptions)
+      })
+    },
+    fetchAllMinePrize() {
+      this.listLoading = true
+      getMyAllPrizes(this.listQuery).then(response => {
+        // console.log(response)
+        this.list = response.data.list
+        console.log(this.list)
+        this.total = response.data.list.length
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.fetchAllMinePrize(this.listQuery)
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
+    },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleUpdate(row) {
+      console.log(row)
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.reportphotos.splice(0, this.temp.reportphotos.length)
+      this.temp.reportdocuments.splice(0, this.temp.reportdocuments.length)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    handleDelete(row, index) {
+      console.log(row, index)
+      deleteReport({ reportId: row.reportId }).then(response => {
+        if (response.errno == 20000) {
+          this.$notify({
+            title: 'Success',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify({
+            title: 'failure',
+            message: '删除失败',
+            type: 'warning',
+            duration: 2000
+          })
+        }
+      })
+      this.fetchAllMinePrize()
+    },
+    handlerSuccessFile(response, file, fileList) {
+      // console.log(file, fileList)
+      this.temp.reportdocuments.push({
+        documentUrl: response.data.url,
+        documentName: file.name
+      })
+    },
+    handlerErrorFile(err, file, fileList) {
+      console.log(err, file, fileList)
+      this.$message.error('上传附件失败，请刷新重试')
+    },
+    handleRemoveFile(file, fileList) {
+      console.log('hello')
+      const FileIndex = this.temp.reportdocuments.filter((elem, index) => {
+        if (elem.documentName == file.name) {
+          return index
+        }
+      })
+      // console.log(FileIndex)
+      this.temp.reportdocuments.splice(FileIndex, 1)
+      console.log(this.temp.reportdocuments)
+    },
+    handleExceedFile(files, fileList) {
+      this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
+    },
+    beforeRemoveFile(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handlerSuccessPicture(response, file, fileList) {
+      console.log(file, fileList)
+      this.temp.reportphotos.push({
+        name: file.name,
+        photoUrl: response.data.url
+      })
+    },
+    handlerErrorPicture(err, file, fileList) {
+      // console.log(err, file, fileList)
+      this.$message.error('上传图片失败，请刷新重试')
+    },
+    handleRemovePicture(file, fileList) {
+      console.log(file, fileList)
+      const PictureIndex = this.temp.reportphotos.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.temp.reportphotos.splice(PictureIndex, 1)
+      // console.log(this.temp.reportPhotos)
+    },
+    beforeRemovePicture(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
     }
   }
+}
 </script>
 <style scoped>
   .filter-container{
