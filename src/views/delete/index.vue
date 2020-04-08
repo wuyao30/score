@@ -66,10 +66,18 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
+      <el-table-column label="留言" align="center" width="200px">
+        <template slot-scope="{row}">
+          <span>{{ judgeMessage(row) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
+          </el-button>
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleMessages(row)">
+            留言
           </el-button>
           <el-button v-waves v-if="row.reportWord=='1'" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,'0')">
             准予考评
@@ -133,7 +141,21 @@
         </el-button>
       </div>
     </el-dialog>
-
+    <el-dialog title="留言" :visible.sync="dialogMessageVisible">
+      <el-form ref="messageForm" :data="message" label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="留言信息">
+          <el-input v-model="message.reportPhoto1" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入留言信息" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogMessageVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="handleSubmitMessage">
+          确认
+        </el-button>
+      </div>
+    </el-dialog>
     <el-tooltip placement="top" content="返回顶部">
       <back-to-top :custom-style="myBackToTopStyle" :visibility-height="300" :back-position="50" transition-name="fade" />
     </el-tooltip>
@@ -141,7 +163,7 @@
 </template>
 
 <script>
-import { adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
+import { adminUpdateMessage, adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -159,8 +181,12 @@ export default {
       return statusMap[status]
     }
   },
+  computed: {
+  },
   data() {
     return {
+      dialogMessageVisible: false,
+      message: {},
       myBackToTopStyle: {
         right: '50px',
         bottom: '50px',
@@ -222,6 +248,39 @@ export default {
     this.fetchPrizesName()
   },
   methods: {
+    judgeMessage(row) {
+      if (row.reportPhoto1 == null) {
+        return '暂无留言'
+      } else {
+        return row.reportPhoto1
+      }
+    },
+    handleSubmitMessage() {
+      console.log(this.message)
+      adminUpdateMessage({ reportId: this.message.reportId, reportPhoto1: this.message.reportPhoto1 }).then(response => {
+        if (response.errno == 20000) {
+          this.$notify.success({
+            title: 'success',
+            message: '留言成功'
+          })
+        } else {
+          this.$notify.error({
+            title: 'error',
+            message: '留言失败'
+          })
+        }
+        this.fetchAllMinePrize()
+        this.dialogMessageVisible = false
+      })
+    },
+    handleMessages(row) {
+      console.log(row)
+      this.message = Object.assign({}, row) // copy obj
+      this.dialogMessageVisible = true
+      this.$nextTick(() => {
+        this.$refs['messageForm'].clearValidate()
+      })
+    },
     handleModifyStatus(row, status) {
       adminUpdateReportStatus({ reportId: row.reportId, reportWord: status }).then(response => {
         if (response.errno == 20000) {

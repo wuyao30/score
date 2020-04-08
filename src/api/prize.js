@@ -182,3 +182,18 @@ export function adminUpdateReportStatus(data) {
     data
   })
 }
+
+export function queryPrizeReportNum() {
+  return request({
+    url: '/prize/allnumdetail',
+    method: 'get'
+  })
+}
+
+export function adminUpdateMessage(data) {
+  return request({
+    url: '/report/updateonereportdesc',
+    method: 'post',
+    data
+  })
+}

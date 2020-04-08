@@ -51,6 +51,20 @@ export const constantRoutes = [
     }]
   },
   {
+    path: '/newChart',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'newTable',
+      name: 'newTable',
+      component: () => import('@/views/table/index'),
+      meta: {
+        title: '申报情况表格',
+        icon: 'tongji'
+      }
+    }]
+  },
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
