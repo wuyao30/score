@@ -67,8 +67,8 @@
         </template>
       </el-table-column>
     </el-table>
-
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="fetchPrizesDetails" />
+
     <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="奖项名称" prop="prizeName">
@@ -111,9 +111,8 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogInsertFormVisible" title="create">
-      <el-form ref="insertForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+    <el-dialog :visible.sync="dialogInsertFormVisible" title="添加奖项">
+      <el-form ref="insertForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 700px; margin-left:50px;">
         <el-form-item label="奖项名称" prop="prizeName">
           <el-input v-model="temp.prizeName" placeholder="请输入奖项名称">
           </el-input>
@@ -144,6 +143,14 @@
         <el-form-item label="获奖数量" prop="prizeNum">
           <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
         </el-form-item>
+        <el-form-item label="申报选项" prop="reportOptions">
+          <el-transfer
+            v-model="reportChooseOptions"
+            :data="reportOptions"
+            :titles="['申报选项', '已选中']"
+            >
+          </el-transfer>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogInsertFormVisible = false">
@@ -167,6 +174,45 @@ export default {
   components: { Pagination },
   data() {
     return {
+      reportChooseOptions: [],
+      reportOptions: [
+        {
+          key: 1,
+          label: '部门'
+        },
+        {
+          key: 2,
+          label: '单位'
+        },
+        {
+          key: 3,
+          label: '部门'
+        },
+        {
+          key: 4,
+          label: '照片'
+        },
+        {
+          key: 5,
+          label: '视频'
+        },
+        {
+          key: 6,
+          label: '事迹材料'
+        },
+        {
+          key: 7,
+          label: '荣誉证书'
+        },
+        {
+          key: 8,
+          label: '资格证书'
+        },
+        {
+          key: 9,
+          label: '申报表格'
+        }
+      ],
       dialogInsertFormVisible: false,
       dialogUpdateFormVisible: false,
       dialogFormVisible: false,
@@ -186,6 +232,9 @@ export default {
         prizeNum: [
           { required: true, message: '获奖数量不能为空' },
           { type: 'number', message: '获奖数量必须为数字值' }
+        ],
+        reportOptions: [
+          { required: true, message: '申报选项不能为空' }
         ]
       },
       temp: {

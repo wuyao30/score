@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '大屯煤电评优评先系统',
+  title: '大屯公司材料上报系统',
 
   /**
    * @type {boolean} true | false

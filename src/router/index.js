@@ -120,7 +120,7 @@ export const asyncRoutes = [
         path: 'evaluation',
         name: 'evaluation',
         component: () => import('@/views/person/evaluation/index'),
-        meta: { title: '打分人员管理', icon: 'pingjia', roles: ['admin'] }
+        meta: { title: '评审人员管理', icon: 'pingjia', roles: ['admin'] }
       }
     ]
   },
@@ -133,7 +133,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'prizeIndex',
         component: () => import('@/views/prize/index'),
-        meta: { title: '奖项管理', icon: 'jiangxiang', roles: ['admin'] }
+        meta: { title: '评审管理', icon: 'jiangxiang', roles: ['admin'] }
       }
     ]
   },
@@ -159,7 +159,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'resultIndex',
         component: () => import('@/views/result/index'),
-        meta: { title: '打分结果', icon: 'shujujieguotongji', roles: ['admin'] }
+        meta: { title: '评审结果', icon: 'shujujieguotongji', roles: ['admin'] }
       }
     ]
   },
