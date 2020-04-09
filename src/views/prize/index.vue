@@ -111,8 +111,8 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogInsertFormVisible" title="添加奖项">
-      <el-form ref="insertForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 700px; margin-left:50px;">
+    <el-dialog :visible.sync="dialogInsertFormVisible" title="添加奖项" width="65%">
+      <el-form ref="insertForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 700px; margin-left:25px;">
         <el-form-item label="奖项名称" prop="prizeName">
           <el-input v-model="temp.prizeName" placeholder="请输入奖项名称">
           </el-input>
@@ -143,10 +143,14 @@
         <el-form-item label="获奖数量" prop="prizeNum">
           <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
         </el-form-item>
-        <el-form-item label="申报选项" prop="reportOptions">
+        <el-form-item label="申报选项">
           <el-transfer
-            v-model="reportChooseOptions"
+            v-model="temp.reportChooseOptions"
             :data="reportOptions"
+            :props="{
+              key: 'id',
+              label: 'optionName'
+            }"
             :titles="['申报选项', '已选中']"
             >
           </el-transfer>
@@ -174,43 +178,46 @@ export default {
   components: { Pagination },
   data() {
     return {
-      reportChooseOptions: [],
       reportOptions: [
         {
-          key: 1,
-          label: '部门'
+          id: 1,
+          optionName: '标题'
         },
         {
-          key: 2,
-          label: '单位'
+          id: 2,
+          optionName: '单位'
         },
         {
-          key: 3,
-          label: '部门'
+          id: 3,
+          optionName: '部门'
         },
         {
-          key: 4,
-          label: '照片'
+          id: 4,
+          optionName: '简介'
         },
         {
-          key: 5,
-          label: '视频'
+          id: 5,
+          optionName: '照片'
         },
         {
-          key: 6,
-          label: '事迹材料'
+          id: 6,
+          optionName: '视频'
         },
         {
-          key: 7,
-          label: '荣誉证书'
+          id: 7,
+          optionName: '事迹材料'
         },
         {
-          key: 8,
-          label: '资格证书'
+          id: 8,
+          optionName: '荣誉证书'
         },
         {
-          key: 9,
-          label: '申报表格'
+          id: 9,
+          optionName: '资格证书'
+        },
+        {
+          id: 10,
+          optionName: '申报表格'
         }
       ],
       dialogInsertFormVisible: false,
@@ -242,7 +249,8 @@ export default {
         startDate: undefined,
         endDate: undefined,
         selectRule: '',
-        winNum: undefined
+        winNum: undefined,
+        reportChooseOptions: []
       },
       dialogStatus: '',
       textMap: {
@@ -269,7 +277,8 @@ export default {
   },
   methods: {
     handleInsertSubmit() {
-      adminInsertPrize(this.temp).then(response => {
+      console.log(this.temp)
+      /* adminInsertPrize(this.temp).then(response => {
         if (response.errno == 20000) {
           this.$message.success('新增奖项成功')
         } else {
@@ -277,7 +286,7 @@ export default {
         }
         this.dialogInsertFormVisible = false
         this.handleFilter()
-      })
+      })*/
     },
     handleSubmit() {
       adminUpdatePrize(this.temp).then(response => {

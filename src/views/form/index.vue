@@ -1,21 +1,24 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-      <el-form-item label="标题" prop="reportName" v-show="false">
-        <el-input v-model="form.reportName" width="80" />
-      </el-form-item>
-      <el-form-item label="单位" prop="reportCompany">
-        <el-input v-model="form.reportCompany" width="80" />
-      </el-form-item>
-      <el-form-item label="部门" prop="reportDepartment">
-        <el-input v-model="form.reportDepartment" width="80" />
-      </el-form-item>
+    <el-form ref="form" :model="form" label-width="120px">
       <el-form-item label="奖项名称" prop="prizeId">
-        <el-select v-model="form.prizeId" placeholder="请选择奖项名称">
+        <el-select v-model="form.prizeId" placeholder="请选择奖项名称" @change="HandleChange">
           <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
         </el-select>
       </el-form-item>
-      <el-form-item label="照片">
+      <el-form-item :label="options[0].optionName" v-show="options[0].visible">
+        <el-input v-model="form.reportName" width="80" />
+      </el-form-item>
+      <el-form-item :label="options[1].optionName" v-show="options[1].visible">
+        <el-input v-model="form.reportCompany" width="80" />
+      </el-form-item>
+      <el-form-item :label="options[2].optionName" v-show="options[2].visible">
+        <el-input v-model="form.reportDepartment" width="80" />
+      </el-form-item>
+      <el-form-item :label="options[3].optionName" v-show="options[3].visible">
+        <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
+      </el-form-item>
+      <el-form-item :label="options[4].optionName" v-show="options[4].visible">
         <el-upload
           class="upload-demo"
           :on-remove="handleRemovePicture"
@@ -27,10 +30,7 @@
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
       </el-form-item>
-      <el-form-item label="简介" prop="reportInfo">
-        <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
-      </el-form-item>
-      <el-form-item label="附件">
+      <el-form-item :label="options[5].optionName" v-show="options[5].visible">
         <el-upload
           class="upload-demo"
           action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -44,8 +44,56 @@
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
       </el-form-item>
+      <el-form-item :label="options[6].optionName" v-show="options[6].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveDeedsFile"
+          :before-remove="beforeRemoveDeedsFile"
+          :on-success="handlerSuccessDeedsFile"
+          :on-error="handlerErrorDeedsFile"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item :label="options[7].optionName" v-show="options[7].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveHonorFile"
+          :before-remove="beforeRemoveHonorFile"
+          :on-success="handlerSuccessHonorFile"
+          :on-error="handlerErrorHonorFile"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item :label="options[8].optionName" v-show="options[8].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveQualificationFile"
+          :before-remove="beforeRemoveQualificationFile"
+          :on-success="handlerSuccessQualificationFile"
+          :on-error="handlerErrorQualificationFile"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item :label="options[9].optionName" v-show="options[9].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveFormFile"
+          :before-remove="beforeRemoveFormFile"
+          :on-success="handlerSuccessFormFile"
+          :on-error="handlerErrorFormFile"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
+        <el-button type="primary" @click="submitForm">立即创建</el-button>
         <el-button @click="resetForm('form')">重置</el-button>
       </el-form-item>
     </el-form>
@@ -58,6 +106,59 @@ import { getSpecificPrizeKind, uploadReport } from '../../api/prize'
 export default {
   data() {
     return {
+      temp: {},
+      options: [
+        {
+          id: 1,
+          optionName: '标题',
+          visible: true
+        },
+        {
+          id: 2,
+          optionName: '单位',
+          visible: true
+        },
+        {
+          id: 3,
+          optionName: '部门',
+          visible: false
+        },
+        {
+          id: 4,
+          optionName: '简介',
+          visible: false
+        },
+        {
+          id: 5,
+          optionName: '照片',
+          visible: true
+        },
+        {
+          id: 6,
+          optionName: '视频',
+          visible: true
+        },
+        {
+          id: 7,
+          optionName: '事迹材料',
+          visible: false
+        },
+        {
+          id: 8,
+          optionName: '荣誉证书',
+          visible: false
+        },
+        {
+          id: 9,
+          optionName: '资格证书',
+          visible: false
+        },
+        {
+          id: 10,
+          optionName: '申报表格',
+          visible: false
+        }
+      ],
       prizeNameOptions: [],
       form: {
         reportName: '',
@@ -66,7 +167,11 @@ export default {
         prizeId: undefined,
         reportInfo: '',
         reportphotos: [],
-        reportdocuments: []
+        reportdocuments: [],
+        deedsFile: [],
+        honorFile: [],
+        qualificationFile: [],
+        FormFile: []
       },
       rules: {
         reportName: [
@@ -91,20 +196,24 @@ export default {
     this.fetchPrizesNames()
   },
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    HandleChange() {
+      console.log(this.form.prizeId)
+    },
+    submitForm() {
+      console.log(this.form)
+      /* uploadReport(this.form).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('upload success')
+        } else {
+          this.$message.warning('upload failure')
+        }
+      })*/
+      /* this.$refs[formName].validate((valid) => {
         if (valid) {
-          uploadReport(this.form).then(response => {
-            if (response.errno == 20000) {
-              this.$message.success('upload success')
-            } else {
-              this.$message.warning('upload failure')
-            }
-          })
         } else {
           return false
         }
-      })
+      })*/
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
@@ -158,6 +267,87 @@ export default {
     },
     beforeRemovePicture(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    beforeRemoveDeedsFile(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveDeedsFile(file, fileList) {
+      let FileIndex = this.form.deedsFile.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.deedsFile.splice(FileIndex, 1)
+    },
+    handlerSuccessDeedsFile(response, file, fileList) {
+      this.form.deedsFile.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorDeedsFile(err, file, fileList) {
+      console.log(err, file, fileList)
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveHonorFile(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveHonorFile(file, fileList) {
+      let FileIndex = this.form.honorFile.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.honorFile.splice(FileIndex, 1)
+    },
+    handlerSuccessHonorFile(response, file, fileList) {
+      this.form.honorFile.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorHonorFile(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveQualificationFile(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveQualificationFile(file, fileList) {
+      let FileIndex = this.form.qualificationFile.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.qualificationFile.splice(FileIndex, 1)
+    },
+    handlerSuccessQualificationFile(response, file, fileList) {
+      this.form.qualificationFile.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorQualificationFile(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveFormFile(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveFormFile(file, fileList) {
+      let FileIndex = this.form.FormFile.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.FormFile.splice(FileIndex, 1)
+    },
+    handlerSuccessFormFile(response, file, fileList) {
+      this.form.FormFile.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorFormFile(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
     }
   }
 }
