@@ -83,7 +83,7 @@
       </el-table-column>
       <el-table-column label="得分" align="center" width="200px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <span>{{ row.reportVideo.substr(0, 3) }}</span>
+          <span>{{ row.reportVideo }}</span>
         </template>
       </el-table-column>
     </el-table>

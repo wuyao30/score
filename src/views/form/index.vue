@@ -92,6 +92,48 @@
           <el-button size="small" type="primary">点击上传</el-button>
         </el-upload>
       </el-form-item>
+      <el-form-item :label="options[10].optionName" v-show="options[10].visible">
+        <el-input v-model="form.otherText1" width="80" />
+      </el-form-item>
+      <el-form-item :label="options[11].optionName" v-show="options[11].visible">
+        <el-input v-model="form.otherText2" width="80" />
+      </el-form-item>
+      <el-form-item :label="options[12].optionName" v-show="options[13].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveOther1File"
+          :before-remove="beforeRemoveOther1File"
+          :on-success="handlerSuccessOther1File"
+          :on-error="handlerErrorOther1File"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item :label="options[13].optionName" v-show="options[13].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveOther2File"
+          :before-remove="beforeRemoveOther2File"
+          :on-success="handlerSuccessOther2File"
+          :on-error="handlerErrorOther2File"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item :label="options[14].optionName" v-show="options[14].visible">
+        <el-upload
+          class="upload-demo"
+          action="http://139.224.135.165:8080/assess/report/addreportphoto"
+          :on-remove="handleRemoveOther3File"
+          :before-remove="beforeRemoveOther3File"
+          :on-success="handlerSuccessOther3File"
+          :on-error="handlerErrorOther3File"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+        </el-upload>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">立即创建</el-button>
         <el-button @click="resetForm('form')">重置</el-button>
@@ -121,12 +163,12 @@ export default {
         {
           id: 3,
           optionName: '部门',
-          visible: false
+          visible: true
         },
         {
           id: 4,
           optionName: '简介',
-          visible: false
+          visible: true
         },
         {
           id: 5,
@@ -141,22 +183,47 @@ export default {
         {
           id: 7,
           optionName: '事迹材料',
-          visible: false
+          visible: true
         },
         {
           id: 8,
           optionName: '荣誉证书',
-          visible: false
+          visible: true
         },
         {
           id: 9,
           optionName: '资格证书',
-          visible: false
+          visible: true
         },
         {
           id: 10,
           optionName: '申报表格',
-          visible: false
+          visible: true
+        },
+        {
+          id: 11,
+          optionName: '其他文本1',
+          visible: true
+        },
+        {
+          id: 12,
+          optionName: '其他文本2',
+          visible: true
+        },
+        {
+          id: 13,
+          optionName: '其他附件1',
+          visible: true
+        },
+        {
+          id: 14,
+          optionName: '其他附件2',
+          visible: true
+        },
+        {
+          id: 15,
+          optionName: '其他附件3',
+          visible: true
         }
       ],
       prizeNameOptions: [],
@@ -171,7 +238,12 @@ export default {
         deedsFile: [],
         honorFile: [],
         qualificationFile: [],
-        FormFile: []
+        FormFile: [],
+        otherText1: undefined,
+        otherText2: undefined,
+        otherFile1: [],
+        otherFile2: [],
+        otherFile3: []
       },
       rules: {
         reportName: [
@@ -197,7 +269,7 @@ export default {
   },
   methods: {
     HandleChange() {
-      console.log(this.form.prizeId)
+      // console.log(this.form.prizeId)
     },
     submitForm() {
       console.log(this.form)
@@ -347,6 +419,66 @@ export default {
       })
     },
     handlerErrorFormFile(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveOther1File(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveOther1File(file, fileList) {
+      let FileIndex = this.form.otherFile1.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.otherFile1.splice(FileIndex, 1)
+    },
+    handlerSuccessOther1File(response, file, fileList) {
+      this.form.otherFile1.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorOther1File(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveOther2File(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveOther2File(file, fileList) {
+      let FileIndex = this.form.otherFile2.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.otherFile2.splice(FileIndex, 1)
+    },
+    handlerSuccessOther2File(response, file, fileList) {
+      this.form.otherFile2.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorOther2File(err, file, fileList) {
+      this.$message.error('上传材料失败，请刷新重试')
+    },
+    beforeRemoveOther3File(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleRemoveOther3File(file, fileList) {
+      let FileIndex = this.form.otherFile3.filter((elem, index) => {
+        if (elem.name == file.name) {
+          return index
+        }
+      })
+      this.form.otherFile3.splice(FileIndex, 1)
+    },
+    handlerSuccessOther3File(response, file, fileList) {
+      this.form.otherFile3.push({
+        url: response.data.url,
+        name: file.name
+      })
+    },
+    handlerErrorOther3File(err, file, fileList) {
       this.$message.error('上传材料失败，请刷新重试')
     }
   }
