@@ -62,14 +62,14 @@
           <span>{{ row.reportInfo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="附件" width="120px" align="center">
+     <!-- <el-table-column label="附件" width="120px" align="center">
         <template slot-scope="{row}">
           <div v-for="(item, index) in row.reportdocuments" :key="index">
             <el-link :href="item.documentUrl" type="success">{{ item.documentName }}</el-link>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column label="平均分" width="140" align="center">
+      </el-table-column>-->
+      <el-table-column label="评审结果" width="140" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportVideo.substr(0, 5) }}</span>
         </template>

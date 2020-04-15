@@ -28,133 +28,103 @@
           <span>{{ scope.row.prizeName }}</span>
         </template>
       </el-table-column>
-      <div v-show="options[0].visible">
-        <el-table-column :label="options[0].optionName" width="110" align="center" >
-          <template slot-scope="scope">
-            <span>{{ scope.row.reportName }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[1].visible">
-        <el-table-column :label="options[1].optionName" width="150px" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.reportCompany }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[2].visible">
-        <el-table-column :label="options[2].optionName" width="150px" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.reportDepartment }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[3].visible">
-        <el-table-column :label="options[3].optionName" width="350px" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.reportInfo }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[4].visible">
-        <el-table-column :label="options[4].optionName" width="200" align="center" class-name="small-padding fixed-width">
-          <template slot-scope="{row}">
-            <el-image
-              style="width: 100px; height: 100px"
-              :src="row.reportphotos[0].photoUrl"
-              :preview-src-list="row.reportphotos.map(function(elem) {
-              return elem.photoUrl
-            })">
-            </el-image>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[5].visible">
-        <el-table-column :label="options[5].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.reportdocuments" :key="index">
-              <el-link :href="item.documentUrl" type="success">{{ item.documentName }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[6].visible">
-        <el-table-column :label="options[6].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.deedsFile" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[7].visible">
-        <el-table-column :label="options[7].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.honorFile" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[8].visible">
-        <el-table-column :label="options[8].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.qualificationFile" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[9].visible">
-        <el-table-column :label="options[9].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.FormFile" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[10].visible">
-        <el-table-column :label="options[10].optionName" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.otherText1 }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[11].visible">
-        <el-table-column :label="options[11].optionName" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.otherText2 }}</span>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[12].visible">
-        <el-table-column :label="options[12].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.otherFile1" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[13].visible">
-        <el-table-column :label="options[13].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.otherFile2" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
-      <div v-show="options[14].visible">
-        <el-table-column :label="options[14].optionName" width="120px" align="center">
-          <template slot-scope="{row}">
-            <div v-for="(item, index) in row.otherFile3" :key="index">
-              <el-link :href="item.url" type="success">{{ item.name }}</el-link>
-            </div>
-          </template>
-        </el-table-column>
-      </div>
+      <el-table-column v-if="options[0].visible" :label="options[0].optionName" width="110" align="center" >
+        <template slot-scope="scope">
+          <span>{{ scope.row.reportName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[1].visible" :label="options[1].optionName" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.reportCompany }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[2].visible" :label="options[2].optionName" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.reportDepartment }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="350px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.reportInfo }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[4].visible" :label="options[4].optionName" width="200" align="center" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="row.reportphotos[0].photoUrl"
+            :preview-src-list="row.reportphotos.map(function(elem) {
+            return elem.photoUrl
+          })">
+          </el-image>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[5].visible" :label="options[5].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.reportdocuments" :key="index">
+            <el-link :href="item.documentUrl" type="success">{{ item.documentName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[6].visible" :label="options[6].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.deedsFile" :key="index">
+            <el-link :href="item.deedsUrl" type="success">{{ item.deedsName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[7].visible" :label="options[7].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.honorFile" :key="index">
+            <el-link :href="item.honorUrl" type="success">{{ item.honorName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[8].visible" :label="options[8].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.qualificationFile" :key="index">
+            <el-link :href="item.qualificationUrl" type="success">{{ item.qualificationName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[9].visible" :label="options[9].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.formFile" :key="index">
+            <el-link :href="item.formUrl" type="success">{{ item.formName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[10].visible" :label="options[10].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText1 }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[11].visible" :label="options[11].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText2 }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[12].visible" :label="options[12].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile1" :key="index">
+            <el-link :href="item.other1Url" type="success">{{ item.other1Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[13].visible" :label="options[13].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile2" :key="index">
+            <el-link :href="item.other2Url" type="success">{{ item.other2Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[14].visible" :label="options[14].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile3" :key="index">
+            <el-link :href="item.other3Url" type="success">{{ item.other3Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
@@ -167,23 +137,23 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
+    <pagination v-if="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp"  label-position="right" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="options[0].optionName" v-show="options[0].visible">
-          <el-input v-model="temp.reportName" width="80" />
+      <el-form ref="dataForm" :model="form"  label-position="right" label-width="120px" style="width: 400px; margin-left:50px;">
+        <el-form-item :label="options[0].optionName" v-if="options[0].visible">
+          <el-input v-model="form.reportName" width="80" />
         </el-form-item>
-        <el-form-item :label="options[1].optionName" v-show="options[1].visible">
-          <el-input v-model="temp.reportCompany" width="80" />
+        <el-form-item :label="options[1].optionName" v-if="options[1].visible">
+          <el-input v-model="form.reportCompany" width="80" />
         </el-form-item>
-        <el-form-item :label="options[2].optionName" v-show="options[2].visible">
-          <el-input v-model="temp.reportDepartment" width="80" />
+        <el-form-item :label="options[2].optionName" v-if="options[2].visible">
+          <el-input v-model="form.reportDepartment" width="80" />
         </el-form-item>
-        <el-form-item :label="options[3].optionName" v-show="options[3].visible">
-          <el-input v-model="temp.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
+        <el-form-item :label="options[3].optionName" v-if="options[3].visible">
+          <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
         </el-form-item>
-        <el-form-item :label="options[4].optionName" v-show="options[4].visible">
+        <el-form-item :label="options[4].optionName" v-if="options[4].visible">
           <el-upload
             class="upload-demo"
             :on-remove="handleRemovePicture"
@@ -195,7 +165,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[5].optionName" v-show="options[5].visible">
+        <el-form-item :label="options[5].optionName" v-if="options[5].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -209,7 +179,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[6].optionName" v-show="options[6].visible">
+        <el-form-item :label="options[6].optionName" v-if="options[6].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -221,7 +191,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[7].optionName" v-show="options[7].visible">
+        <el-form-item :label="options[7].optionName" v-if="options[7].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -233,7 +203,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[8].optionName" v-show="options[8].visible">
+        <el-form-item :label="options[8].optionName" v-if="options[8].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -245,7 +215,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[9].optionName" v-show="options[9].visible">
+        <el-form-item :label="options[9].optionName" v-if="options[9].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -257,13 +227,13 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[10].optionName" v-show="options[10].visible">
-          <el-input v-model="temp.otherText1" width="80" />
+        <el-form-item :label="options[10].optionName" v-if="options[10].visible">
+          <el-input v-model="form.otherText1" width="80" />
         </el-form-item>
-        <el-form-item :label="options[11].optionName" v-show="options[11].visible">
-          <el-input v-model="temp.otherText2" width="80" />
+        <el-form-item :label="options[11].optionName" v-if="options[11].visible">
+          <el-input v-model="form.otherText2" width="80" />
         </el-form-item>
-        <el-form-item :label="options[12].optionName" v-show="options[13].visible">
+        <el-form-item :label="options[12].optionName" v-if="options[13].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -275,7 +245,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[13].optionName" v-show="options[13].visible">
+        <el-form-item :label="options[13].optionName" v-if="options[13].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -287,7 +257,7 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="options[14].optionName" v-show="options[14].visible">
+        <el-form-item :label="options[14].optionName" v-if="options[14].visible">
           <el-upload
             class="upload-demo"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
@@ -313,7 +283,7 @@
 </template>
 
 <script>
-import { updateReport, getMyAllPrizes, getSpecificPrizeKind, deleteReport } from '../../api/prize'
+import { queryPrizeOptions, updateReport, getMyAllPrizes, getSpecificPrizeKind, deleteReport } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 // import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -430,7 +400,7 @@ export default {
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
+      form: {
         reportId: undefined,
         reportName: '',
         reportCompany: '',
@@ -442,7 +412,7 @@ export default {
         deedsFile: [],
         honorFile: [],
         qualificationFile: [],
-        FormFile: [],
+        formFile: [],
         otherText1: undefined,
         otherText2: undefined,
         otherFile1: [],
@@ -483,8 +453,8 @@ export default {
   },
   methods: {
     handleSubmit() {
-      console.log(this.temp)
-      updateReport(this.temp).then(response => {
+      console.log(this.form)
+      updateReport(this.form).then(response => {
         if (response.errno == 20000 ) {
           this.$message({
             message: '修改申报明细成功',
@@ -495,10 +465,10 @@ export default {
             message: '修改申报明细失败',
             type: 'error'
           })
+          this.fetchAllMinePrize()
         }
       })
       this.dialogFormVisible = false
-      this.fetchAllMinePrize()
     },
     fetchPrizesName() {
       getSpecificPrizeKind().then(response => {
@@ -517,9 +487,21 @@ export default {
       })
     },
     handleFilter() {
+      queryPrizeOptions({ prizeId: this.listQuery.prizeId }).then(response => {
+        if (response.errno == 20000) {
+          this.options = []
+          this.options = response.data.map(elem => {
+            return {
+              id: elem.chooseId,
+              optionName: elem.optionName,
+              visible: JSON.parse(elem.visible)
+            }
+          })
+        }
+        console.log(this.options)
+      })
       getMyAllPrizes(this.listQuery).then(response => {
         this.list = response.data.list
-        console.log(this.list)
         this.total = response.data.list.length
         setTimeout(() => {
           this.listLoading = false
@@ -541,9 +523,16 @@ export default {
       this.handleFilter()
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.reportphotos.splice(0, this.temp.reportphotos.length)
-      this.temp.reportdocuments.splice(0, this.temp.reportdocuments.length)
+      this.form = Object.assign({}, row) // copy obj
+      this.form.reportphotos.splice(0, this.form.reportphotos.length)
+      this.form.reportdocuments.splice(0, this.form.reportdocuments.length)
+      this.form.deedsFile.splice(0, this.form.deedsFile.length)
+      this.form.honorFile.splice(0, this.form.honorFile.length)
+      this.form.qualificationFile.splice(0, this.form.qualificationFile.length)
+      this.form.formFile.splice(0, this.form.formFile.length)
+      this.form.otherFile1.splice(0, this.form.otherFile1.length)
+      this.form.otherFile2.splice(0, this.form.otherFile2.length)
+      this.form.otherFile3.splice(0, this.form.otherFile3.length)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -572,7 +561,7 @@ export default {
       this.fetchAllMinePrize()
     },
     handlerSuccessFile(response, file, fileList) {
-      this.temp.reportdocuments.push({
+      this.form.reportdocuments.push({
         documentUrl: response.data.url,
         documentName: file.name
       })
@@ -581,14 +570,12 @@ export default {
       this.$message.error('上传附件失败，请刷新重试')
     },
     handleRemoveFile(file, fileList) {
-      console.log('hello')
-      const FileIndex = this.temp.reportdocuments.filter((elem, index) => {
+      let FileIndex = this.form.reportdocuments.filter((elem, index) => {
         if (elem.documentName == file.name) {
           return index
         }
       })
-      this.temp.reportdocuments.splice(FileIndex, 1)
-      console.log(this.temp.reportdocuments)
+      this.form.reportdocuments.splice(FileIndex, 1)
     },
     handleExceedFile(files, fileList) {
       this.$message.warning(`当前限制选择 5 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
@@ -597,25 +584,22 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handlerSuccessPicture(response, file, fileList) {
-      console.log(file, fileList)
-      this.temp.reportphotos.push({
-        name: file.name,
-        photoUrl: response.data.url
+      this.form.reportphotos.push({
+        photoUrl: response.data.url,
+        name: file.name
       })
     },
     handlerErrorPicture(err, file, fileList) {
-      // console.log(err, file, fileList)
+      console.log(err, file, fileList)
       this.$message.error('上传图片失败，请刷新重试')
     },
     handleRemovePicture(file, fileList) {
-      console.log(file, fileList)
-      const PictureIndex = this.temp.reportphotos.filter((elem, index) => {
+      let PictureIndex = this.form.reportphotos.filter((elem, index) => {
         if (elem.name == file.name) {
           return index
         }
       })
-      this.temp.reportphotos.splice(PictureIndex, 1)
-      // console.log(this.temp.reportPhotos)
+      this.form.reportphotos.splice(PictureIndex, 1)
     },
     beforeRemovePicture(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
@@ -624,17 +608,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveDeedsFile(file, fileList) {
-      let FileIndex = this.temp.deedsFile.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.deedsFile.filter((elem, index) => {
+        if (elem.deedsName == file.name) {
           return index
         }
       })
-      this.temp.deedsFile.splice(FileIndex, 1)
+      this.form.deedsFile.splice(FileIndex, 1)
     },
     handlerSuccessDeedsFile(response, file, fileList) {
-      this.temp.deedsFile.push({
-        url: response.data.url,
-        name: file.name
+      this.form.deedsFile.push({
+        deedsUrl: response.data.url,
+        deedsName: file.name
       })
     },
     handlerErrorDeedsFile(err, file, fileList) {
@@ -645,17 +629,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveHonorFile(file, fileList) {
-      let FileIndex = this.temp.honorFile.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.honorFile.filter((elem, index) => {
+        if (elem.honorName == file.name) {
           return index
         }
       })
-      this.temp.honorFile.splice(FileIndex, 1)
+      this.form.honorFile.splice(FileIndex, 1)
     },
     handlerSuccessHonorFile(response, file, fileList) {
-      this.temp.honorFile.push({
-        url: response.data.url,
-        name: file.name
+      this.form.honorFile.push({
+        honorUrl: response.data.url,
+        honorName: file.name
       })
     },
     handlerErrorHonorFile(err, file, fileList) {
@@ -665,17 +649,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveQualificationFile(file, fileList) {
-      let FileIndex = this.temp.qualificationFile.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.qualificationFile.filter((elem, index) => {
+        if (elem.qualificationName == file.name) {
           return index
         }
       })
-      this.temp.qualificationFile.splice(FileIndex, 1)
+      this.form.qualificationFile.splice(FileIndex, 1)
     },
     handlerSuccessQualificationFile(response, file, fileList) {
-      this.temp.qualificationFile.push({
-        url: response.data.url,
-        name: file.name
+      this.form.qualificationFile.push({
+        qualificationUrl: response.data.url,
+        qualificationName: file.name
       })
     },
     handlerErrorQualificationFile(err, file, fileList) {
@@ -685,17 +669,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveFormFile(file, fileList) {
-      let FileIndex = this.temp.FormFile.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.formFile.filter((elem, index) => {
+        if (elem.formName == file.name) {
           return index
         }
       })
-      this.temp.FormFile.splice(FileIndex, 1)
+      this.form.formFile.splice(FileIndex, 1)
     },
     handlerSuccessFormFile(response, file, fileList) {
-      this.temp.FormFile.push({
-        url: response.data.url,
-        name: file.name
+      this.form.formFile.push({
+        formUrl: response.data.url,
+        formName: file.name
       })
     },
     handlerErrorFormFile(err, file, fileList) {
@@ -705,17 +689,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveOther1File(file, fileList) {
-      let FileIndex = this.temp.otherFile1.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.otherFile1.filter((elem, index) => {
+        if (elem.other1Name == file.name) {
           return index
         }
       })
-      this.temp.otherFile1.splice(FileIndex, 1)
+      this.form.otherFile1.splice(FileIndex, 1)
     },
     handlerSuccessOther1File(response, file, fileList) {
-      this.temp.otherFile1.push({
-        url: response.data.url,
-        name: file.name
+      this.form.otherFile1.push({
+        other1Url: response.data.url,
+        other1Name: file.name
       })
     },
     handlerErrorOther1File(err, file, fileList) {
@@ -725,17 +709,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveOther2File(file, fileList) {
-      let FileIndex = this.temp.otherFile2.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.otherFile2.filter((elem, index) => {
+        if (elem.other2Name == file.name) {
           return index
         }
       })
-      this.temp.otherFile2.splice(FileIndex, 1)
+      this.form.otherFile2.splice(FileIndex, 1)
     },
     handlerSuccessOther2File(response, file, fileList) {
-      this.temp.otherFile2.push({
-        url: response.data.url,
-        name: file.name
+      this.form.otherFile2.push({
+        other2Url: response.data.url,
+        other2Name: file.name
       })
     },
     handlerErrorOther2File(err, file, fileList) {
@@ -745,17 +729,17 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemoveOther3File(file, fileList) {
-      let FileIndex = this.temp.otherFile3.filter((elem, index) => {
-        if (elem.name == file.name) {
+      let FileIndex = this.form.otherFile3.filter((elem, index) => {
+        if (elem.other3Name == file.name) {
           return index
         }
       })
-      this.temp.otherFile3.splice(FileIndex, 1)
+      this.form.otherFile3.splice(FileIndex, 1)
     },
     handlerSuccessOther3File(response, file, fileList) {
-      this.temp.otherFile3.push({
-        url: response.data.url,
-        name: file.name
+      this.form.otherFile3.push({
+        other3Url: response.data.url,
+        other3Name: file.name
       })
     },
     handlerErrorOther3File(err, file, fileList) {

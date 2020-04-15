@@ -19,8 +19,8 @@
       @sort-change="sortChange"
     >
       <el-table-column label="ID" prop="id" align="center" width="80">
-        <template slot-scope="{row}">
-          <span>{{ row.reportId }}</span>
+        <template slot-scope="scope">
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="奖项名称" width="140" align="center">
@@ -59,13 +59,13 @@
           <span>{{ row.reportInfo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="附件" width="120px" align="center">
+      <!--<el-table-column label="附件" width="120px" align="center">
         <template slot-scope="{row}">
           <div v-for="(item, index) in row.reportdocuments" :key="index">
             <el-link :href="item.documentUrl" type="success">{{item.documentName}}</el-link>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column label="留言" align="center" width="200px">
         <template slot-scope="{row}">
           <span>{{ judgeMessage(row) }}</span>

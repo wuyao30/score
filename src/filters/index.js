@@ -1,5 +1,5 @@
 // import parseTime, formatTime and set to filter
-export { parseTime, formatTime, substrTime } from '@/utils'
+export { parseTime, formatTime, substrTime, ModeHandlle } from '@/utils'
 
 /**
  * Show plural label if time is plural number

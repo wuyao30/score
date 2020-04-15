@@ -70,3 +70,10 @@ export function insertEvaluation(data) {
   })
 }
 
+export function updateOnePerson(data) {
+  return request({
+    url: '/user/updateone',
+    method: 'post',
+    data
+  })
+}

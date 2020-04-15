@@ -56,6 +56,11 @@
           <span>{{ scope.row.prizeNum }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="评审方式" width="110" align="center">
+        <template slot-scope="scope">
+          <el-tag>{{ scope.row.evaluateMode | ModeHandlle }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
@@ -70,7 +75,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="fetchPrizesDetails" />
 
     <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="updateForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 700px; margin-left:25px;">
         <el-form-item label="奖项名称" prop="prizeName">
           <el-input v-model="temp.prizeName" placeholder="请输入奖项名称">
           </el-input>
@@ -100,6 +105,24 @@
         </el-form-item>
         <el-form-item label="获奖数量" prop="prizeNum">
           <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
+        </el-form-item>
+        <el-form-item label="评审方式" prop="evaluateMode">
+          <el-radio-group v-model="temp.evaluateMode">
+            <el-radio :label="0">投票评审</el-radio>
+            <el-radio :label="1">分数评审</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="申报选项">
+          <el-transfer
+            v-model="temp.options"
+            :data="reportOptions"
+            :props="{
+              key: 'chooseId',
+              label: 'optionName'
+            }"
+            :titles="['申报选项', '已选中']"
+          >
+          </el-transfer>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -143,12 +166,18 @@
         <el-form-item label="获奖数量" prop="prizeNum">
           <el-input v-model.number="temp.prizeNum" placeholder="请输入获奖数量" />
         </el-form-item>
+        <el-form-item label="评审方式" prop="evaluateMode">
+          <el-radio-group v-model="temp.evaluateMode">
+            <el-radio :label="0">投票评审</el-radio>
+            <el-radio :label="1">分数评审</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="申报选项">
           <el-transfer
-            v-model="temp.reportChooseOptions"
+            v-model="temp.options"
             :data="reportOptions"
             :props="{
-              key: 'id',
+              key: 'chooseId',
               label: 'optionName'
             }"
             :titles="['申报选项', '已选中']"
@@ -170,7 +199,7 @@
 
 <script>
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { adminInsertPrize, adminUpdatePrize, getSpecificPrizeKind, adminPrizes, adminDeletePrize } from '../../api/prize'
+import { queryOptionsByPrizeId, adminGetPrizeOptions, adminInsertPrize, adminUpdatePrize, getSpecificPrizeKind, adminPrizes, adminDeletePrize } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 
 export default {
@@ -178,48 +207,7 @@ export default {
   components: { Pagination },
   data() {
     return {
-      reportOptions: [
-        {
-          id: 1,
-          optionName: '标题'
-        },
-        {
-          id: 2,
-          optionName: '单位'
-        },
-        {
-          id: 3,
-          optionName: '部门'
-        },
-        {
-          id: 4,
-          optionName: '简介'
-        },
-        {
-          id: 5,
-          optionName: '照片'
-        },
-        {
-          id: 6,
-          optionName: '视频'
-        },
-        {
-          id: 7,
-          optionName: '事迹材料'
-        },
-        {
-          id: 8,
-          optionName: '荣誉证书'
-        },
-        {
-          id: 9,
-          optionName: '资格证书'
-        },
-        {
-          id: 10,
-          optionName: '申报表格'
-        }
-      ],
+      reportOptions: [],
       dialogInsertFormVisible: false,
       dialogUpdateFormVisible: false,
       dialogFormVisible: false,
@@ -240,6 +228,9 @@ export default {
           { required: true, message: '获奖数量不能为空' },
           { type: 'number', message: '获奖数量必须为数字值' }
         ],
+        evaluateMode: [
+          { required: true, message: '评审方式不能为空' }
+        ],
         reportOptions: [
           { required: true, message: '申报选项不能为空' }
         ]
@@ -249,8 +240,9 @@ export default {
         startDate: undefined,
         endDate: undefined,
         selectRule: '',
-        winNum: undefined,
-        reportChooseOptions: []
+        prizeNum: undefined,
+        options: [],
+        evaluateMode: 0
       },
       dialogStatus: '',
       textMap: {
@@ -274,11 +266,15 @@ export default {
   created() {
     this.fetchPrizesInfo()
     this.fetchPrizesDetails()
+    adminGetPrizeOptions().then(response => {
+      this.reportOptions = response.data
+    }).catch(error => {
+      console.log(error)
+    })
   },
   methods: {
     handleInsertSubmit() {
-      console.log(this.temp)
-      /* adminInsertPrize(this.temp).then(response => {
+       adminInsertPrize(this.temp).then(response => {
         if (response.errno == 20000) {
           this.$message.success('新增奖项成功')
         } else {
@@ -286,7 +282,7 @@ export default {
         }
         this.dialogInsertFormVisible = false
         this.handleFilter()
-      })*/
+      })
     },
     handleSubmit() {
       adminUpdatePrize(this.temp).then(response => {
@@ -307,12 +303,19 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log(row)
-      this.temp = Object.assign({}, row)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      queryOptionsByPrizeId({ prizeId: row.prizeId }).then(response => {
+        const options = response.data[0].optionss.map(elem => {
+          return elem.optionChoose
+        })
+        this.temp = response.data[0]
+        this.temp.options = options
+        this.temp.prizeId = row.prizeId
+        console.log(this.temp)
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     handleDelete(row) {

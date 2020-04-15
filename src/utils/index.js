@@ -1,6 +1,15 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
+export function ModeHandlle(data) {
+  if(data == 0 ) {
+    return '投票评审'
+  } else {
+    return '分数评审'
+  }
+}
+
+
 export function substrTime(time) {
   time = time.substr(0, 10)
   return time

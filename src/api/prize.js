@@ -9,7 +9,7 @@ export function queryChartData() {
 
 export function getMyAllPrizes(data) {
   return request({
-    url: '/report/getmyallreport',
+    url: '/report/getmyprizeidreport',
     method: 'post',
     data
   })
@@ -31,7 +31,7 @@ export function getSpecificPrizeKind() {
 
 export function updateReport(data) {
   return request({
-    url: '/report/updateonereport',
+    url: '/prizechoose/updateonereport',
     method: 'post',
     data
   })
@@ -75,7 +75,7 @@ export function deleteReport(data) {
 
 export function adminUpdatePrize(data) {
   return request({
-    url: '/prize/updateprizebyprize',
+    url: '/prizechoose/updateprizebyprize  ',
     method: 'post',
     data
   })
@@ -83,7 +83,7 @@ export function adminUpdatePrize(data) {
 
 export function adminInsertPrize(data) {
   return request({
-    url: '/prize/add',
+    url: '/prizechoose/add',
     method: 'post',
     data
   })
@@ -91,7 +91,7 @@ export function adminInsertPrize(data) {
 
 export function uploadReport(data) {
   return request({
-    url: '/report/addreportrecord',
+    url: '/prizechoose/addreportrecord',
     method: 'post',
     data
   })
@@ -114,7 +114,7 @@ export function adminPrizes(data) {
 
 export function adminDeletePrize(data) {
   return request({
-    url: '/prize/delprize',
+    url: '/prizechoose/delprize',
     method: 'post',
     data
   })
@@ -193,6 +193,37 @@ export function queryPrizeReportNum() {
 export function adminUpdateMessage(data) {
   return request({
     url: '/report/updateonereportdesc',
+    method: 'post',
+    data
+  })
+}
+
+export function adminGetPrizeOptions() {
+  return request({
+    url: '/prizechoose/getallprizechoose',
+    method: 'get'
+  })
+}
+
+export function adminPostPrize(data) {
+  return request({
+    url: '/prizechoose/add',
+    method: 'post',
+    data
+  })
+}
+
+export function queryPrizeOptions(data) {
+  return request({
+    url: '/prizechoose/choosedetail',
+    method: 'post',
+    data
+  })
+}
+
+export function queryOptionsByPrizeId(data) {
+  return request({
+    url: '/prizechoose/allnumsss',
     method: 'post',
     data
   })

@@ -131,6 +131,41 @@
         </el-button>
       </div>
     </el-dialog>
+    <el-dialog :visible.sync="dialogUpdateFormVisible" title="修改">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="登录名" prop="loginName">
+          <el-input v-model="temp.loginName" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="temp.name" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="telephone">
+          <el-input v-model="temp.telephone" />
+        </el-form-item>
+        <el-form-item label="单位" prop="company">
+          <el-input v-model="temp.company" />
+        </el-form-item>
+        <el-form-item label="部门" prop="department">
+          <el-input v-model="temp.department" />
+        </el-form-item>
+        <el-form-item label="奖项名称" prop="enableFlage2">
+          <el-select v-model="temp.enableFlage2" placeholder="请选择奖项名称">
+            <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" :disabled="item.disabled" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="updateData">
+          确认修改
+        </el-button>
+      </div>
+    </el-dialog>
     <!--可自定义按钮的样式、show/hide临界点、返回的位置  -->
     <!--如需文字提示，可在外部添加element的<el-tooltip></el-tooltip>元素  -->
     <el-tooltip placement="top" content="返回顶部">
@@ -141,7 +176,7 @@
 
 <script>
 import { getSpecificPrizeKind, queryReportDepartment } from '../../../api/prize'
-import { queryEvaluation, queryAllEvaluation, insertEvaluation, deleteReporter, modifyUserStatus } from '../../../api/person'
+import { updateOnePerson, queryEvaluation, queryAllEvaluation, insertEvaluation, deleteReporter, modifyUserStatus } from '../../../api/person'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import BackToTop from '@/components/BackToTop'
@@ -152,6 +187,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      dialogUpdateFormVisible: false,
       prizeNameOptions: [],
       tableKey: 0,
       list: null,
@@ -166,6 +202,7 @@ export default {
       },
       companyOptions: [{ label: '大屯煤电团支部', key: '1' }, { label: '姚庄煤矿团委', key: '2' }],
       temp: {
+        userId: undefined,
         loginName: undefined,
         username: undefined,
         password: undefined,
@@ -219,6 +256,17 @@ export default {
         this.handleFilter()
       })
     },
+    updateData() {
+      updateOnePerson(this.temp).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('修改评分账号成功')
+        } else {
+          this.$message.warning('修改评分账号失败，请重试')
+        }
+        this.handleFilter()
+        this.dialogUpdateFormVisible = false
+      })
+    },
     createData() {
       insertEvaluation(this.temp).then(response => {
         if (response.errno == 20000) {
@@ -256,7 +304,7 @@ export default {
       })
     },
     confirmUpdatePsw(raw) {
-      this.dialogFormVisible = true
+      this.dialogUpdateFormVisible = true
       this.temp = Object.assign({}, raw)
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
