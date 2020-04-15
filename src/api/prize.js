@@ -228,3 +228,11 @@ export function queryOptionsByPrizeId(data) {
     data
   })
 }
+
+export function adminModifyOPtionsName(data) {
+  return request({
+    url: '/prizechoose/updateoptionname',
+    method: 'post',
+    data
+  })
+}

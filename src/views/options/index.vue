@@ -13,14 +13,9 @@
         </template>
       </el-table-column>
       <el-table-column label="选项名称" width="300" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.optionName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Title" width="400">
         <template slot-scope="{row}">
           <template v-if="row.edit">
-            <el-input v-model="row.optionNewName" class="edit-input" size="small" />
+            <el-input v-model="row.optionNewName" class="edit-input" width="200" size="small" />
             <el-button
               class="cancel-btn"
               size="small"
@@ -28,7 +23,7 @@
               type="warning"
               @click="cancelEdit(row)"
             >
-              cancel
+              取消
             </el-button>
           </template>
           <span v-else>{{ row.optionName }}</span>
@@ -44,7 +39,7 @@
             icon="el-icon-circle-check-outline"
             @click="confirmEdit(row)"
           >
-            Ok
+            确认
           </el-button>
           <el-button
             v-else
@@ -53,7 +48,7 @@
             icon="el-icon-edit"
             @click="row.edit=!row.edit"
           >
-            Edit
+            编辑
           </el-button>
         </template>
       </el-table-column>
@@ -62,7 +57,7 @@
 </template>
 
 <script>
-import { adminGetPrizeOptions } from "../../api/prize";
+import { adminGetPrizeOptions, adminModifyOPtionsName } from "../../api/prize";
 
 export default {
   name: 'index',
@@ -90,16 +85,25 @@ export default {
       row.optionNewName = row.optionName
       row.edit = false
       this.$message({
-        message: 'The title has been restored to the original value',
+        message: '取消修改选项名称',
         type: 'warning'
       })
     },
     confirmEdit(row) {
       row.edit = false
       row.optionName = row.optionNewName
-      this.$message({
-        message: 'The title has been edited',
-        type: 'success'
+      adminModifyOPtionsName({ chooseId: row.chooseId, optionName: row.optionName }).then(response => {
+        if(response.errno == 20000) {
+          this.$notify.success({
+            title:'成功',
+            message: '修改选项名称成功'
+          })
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: '修改选项名称失败'
+          })
+        }
       })
     }
   }
