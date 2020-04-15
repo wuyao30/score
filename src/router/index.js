@@ -177,6 +177,19 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/options',
+    component: Layout,
+    name: 'options',
+    children: [
+      {
+        path: 'index',
+        name: 'optionsIndex',
+        component: () => import('@/views/options/index'),
+        meta: { title: '修改选项信息', icon: 'xuanxiang', roles: ['admin'] }
+      }
+    ]
+  },
+  {
     path: '/mine',
     component: Layout,
     name: 'mine',

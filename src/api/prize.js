@@ -67,7 +67,7 @@ export function getAllPrizeNames() {
 
 export function deleteReport(data) {
   return request({
-    url: '/report/delonereport',
+    url: '/prizechoose/delonereport',
     method: 'post',
     data
   })
