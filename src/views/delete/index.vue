@@ -54,9 +54,16 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column label="简介" width="350px" align="center">
+      <el-table-column label="简介" width="200" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.reportInfo }}</span>
+          <el-popover
+            placement="top-start"
+            title="简介信息"
+            width="500"
+            trigger="hover"
+            :content=row.reportInfo>
+            <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
+          </el-popover>
         </template>
       </el-table-column>
       <!--<el-table-column label="附件" width="120px" align="center">
@@ -156,9 +163,6 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-tooltip placement="top" content="返回顶部">
-      <back-to-top :custom-style="myBackToTopStyle" :visibility-height="300" :back-position="50" transition-name="fade" />
-    </el-tooltip>
   </div>
 </template>
 

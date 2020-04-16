@@ -9,6 +9,11 @@ export function ModeHandlle(data) {
   }
 }
 
+export function substrInfo(data) {
+  console.log(data)
+  const result = data.split('').slice(0, 50).join('')
+  return result
+}
 
 export function substrTime(time) {
   time = time.substr(0, 10)

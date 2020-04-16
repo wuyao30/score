@@ -45,7 +45,14 @@
       </el-table-column>
       <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="350px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.reportInfo }}</span>
+          <el-popover
+            placement="top-start"
+            title="简介信息"
+            width="500"
+            trigger="hover"
+            :content=row.reportInfo>
+            <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column v-if="options[4].visible" :label="options[4].optionName" width="200" align="center" class-name="small-padding fixed-width">
