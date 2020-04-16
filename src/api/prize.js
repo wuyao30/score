@@ -138,7 +138,7 @@ export function adminGetScore(data) {
 
 export function adminGetScoreNoPagenite(data) {
   return request({
-    url: '/report/getmarkresultbyprizeid',
+    url: '/prizechoose/getmarkresultbyprizeid',
     method: 'post',
     data
   })
