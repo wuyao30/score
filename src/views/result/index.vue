@@ -45,6 +45,16 @@
           <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="申报人"  align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="申报人单位"  align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.company }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="照片" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-image
@@ -56,7 +66,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column label="简介" align="center">
+     <!-- <el-table-column label="简介" align="center">
         <template slot-scope="{row}">
           <el-popover
             placement="top-start"
@@ -67,7 +77,7 @@
             <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
           </el-popover>
         </template>
-      </el-table-column>
+      </el-table-column>-->
      <!-- <el-table-column label="附件" width="120px" align="center">
         <template slot-scope="{row}">
           <div v-for="(item, index) in row.reportdocuments" :key="index">

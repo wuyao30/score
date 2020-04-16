@@ -68,7 +68,7 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" icon="el-icon-setting" size="mini" @click="confirmUpdatePsw(row)">
-            重置密码
+            修改信息
           </el-button>
           <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(row)">
             删除
@@ -119,7 +119,36 @@
         </el-button>
       </div>
     </el-dialog>
-
+    <el-dialog :visible.sync="dialogUpdateFormVisible" title="修改">
+      <el-form ref="updateForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="登录名" prop="loginName">
+          <el-input v-model="temp.loginName" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="temp.name" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="telephone">
+          <el-input v-model="temp.telephone" />
+        </el-form-item>
+        <el-form-item label="单位" prop="company">
+          <el-input v-model="temp.company" />
+        </el-form-item>
+        <el-form-item label="部门" prop="department">
+          <el-input v-model="temp.department" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogUpdateFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="updateUser">
+          确认修改
+        </el-button>
+      </div>
+    </el-dialog>
     <!--可自定义按钮的样式、show/hide临界点、返回的位置  -->
     <!--如需文字提示，可在外部添加element的<el-tooltip></el-tooltip>元素  -->
     <el-tooltip placement="top" content="返回顶部">
@@ -130,7 +159,7 @@
 
 <script>
 import { queryReportDepartment } from '../../../api/prize'
-import { modifyUserStatus, getReportersInfo, queryAllReporter, submitReporter, updateReportPassword, deleteReporter } from '../../../api/person'
+import { updateOnePerson, modifyUserStatus, getReportersInfo, queryAllReporter, submitReporter, updateReportPassword, deleteReporter } from '../../../api/person'
 import waves from '@/directive/waves' // Waves directive
 // import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -142,6 +171,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      dialogUpdateFormVisible: false,
       tableKey: 0,
       list: null,
       total: 0,
@@ -199,6 +229,17 @@ export default {
     })
   },
   methods: {
+    updateUser() {
+      updateOnePerson(this.temp).then(response => {
+        if (response.errno == 20000) {
+          this.$message.success('修改账号成功')
+        } else {
+          this.$message.warning('修改账号失败，请重试')
+        }
+        this.handleFilter()
+        this.dialogUpdateFormVisible = false
+      })
+    },
     templateResponse(response) {
       if (response.errno == 20000) {
         this.$notify.success({
@@ -213,9 +254,10 @@ export default {
       }
     },
     confirmUpdatePsw(row) {
-      updateReportPassword({ userId: row.userId }).then(response => {
-        this.templateResponse(response)
-        this.handleFilter()
+      this.dialogUpdateFormVisible = true
+      this.temp = Object.assign({}, row)
+      this.$nextTick(() => {
+        this.$refs['updateForm'].clearValidate()
       })
     },
     deleteUser(row) {
@@ -289,7 +331,7 @@ export default {
     async handleDownloadAll() {
       this.downloadLoading = true
       let result = await queryAllReporter()
-      let list = result.data.users
+      let list = result.data
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['id', '登录名', '密码', '姓名', '手机号', '单位', '部门', '状态']
         const filterVal = ['userId', 'loginName', 'password', 'name', 'telephone', 'company', 'department', 'enableFlage']
