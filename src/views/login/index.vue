@@ -43,7 +43,7 @@
 
       <div class="button-container">
         <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">申报登陆</el-button>
-        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">评选登陆</el-button>
+        <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">评审登陆</el-button>
         <el-button :loading="loading" type="primary" class="login-button" @click.native.prevent="handleLogin">管理员登陆</el-button>
       </div>
     </el-form>

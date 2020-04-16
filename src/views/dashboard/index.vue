@@ -564,8 +564,8 @@ export default {
             duration: 2000
           })
         }
+        this.fetchAllMinePrize()
       })
-      this.fetchAllMinePrize()
     },
     handlerSuccessFile(response, file, fileList) {
       this.form.reportdocuments.push({
