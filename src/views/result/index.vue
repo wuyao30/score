@@ -19,34 +19,33 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" align="center" width="80">
+      <el-table-column label="ID" prop="id" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="奖项名称" width="160" align="center">
+      <el-table-column label="奖项名称" align="center">
         <template slot-scope="{row}">
           <span>{{ row.prizeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标题" width="130" align="center">
+      <el-table-column label="标题"  align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="单位" width="150px" align="center">
+      <el-table-column label="单位"  align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportCompany }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部门" width="150px" align="center">
+      <el-table-column label="部门" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="照片" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-image
             style="width: 100px; height: 100px"
@@ -57,9 +56,16 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column label="简介" width="370" align="center">
+      <el-table-column label="简介" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.reportInfo }}</span>
+          <el-popover
+            placement="top-start"
+            title="简介信息"
+            width="500"
+            trigger="hover"
+            :content=row.reportInfo>
+            <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
+          </el-popover>
         </template>
       </el-table-column>
      <!-- <el-table-column label="附件" width="120px" align="center">
@@ -69,7 +75,12 @@
           </div>
         </template>
       </el-table-column>-->
-      <el-table-column label="评审结果" width="140" align="center">
+      <el-table-column v-if="prize.evaluateMode == 0" label="评审票数" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.votes }} 票</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="prize.evaluateMode == 1" label="评审分数" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportVideo.substr(0, 5) }}</span>
         </template>
@@ -79,7 +90,7 @@
   </div>
 </template>
 <script>
-import { getSpecificPrizeKind, adminGetScore, adminGetScoreNoPagenite } from '../../api/prize'
+import { adminPrizes, getSpecificPrizeKind, adminGetScore, adminGetScoreNoPagenite } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 export default {
@@ -99,7 +110,10 @@ export default {
       list: [],
       total: 0,
       listLoading: false,
-      downloadLoading: false
+      downloadLoading: false,
+      prize: {
+        evaluateMode: 0
+      }
     }
   },
   created() {
@@ -117,13 +131,17 @@ export default {
           this.$message.error('获取结果失败，请重试')
         }
       })
+      adminPrizes({prizeId: this.listQuery.prizeId}).then(response => {
+        this.prize = {}
+        this.prize = response.data.list[0]
+      })
     },
     async handleDownload() {
       this.downloadLoading = true
       const result = await adminGetScoreNoPagenite({ prizeId: this.listQuery.prizeId })
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['id', '奖项名称', '申报人员名称', '申报人员单位', '申报人员部门', '标题', '单位', '部门', '简介', '得分(平均分)']
-        const filterVal = ['reportId', 'prizeName', 'name', 'company', 'department', 'reportName', 'reportCompany', 'reportDepartment', 'reportInfo', 'reportVideo']
+        const tHeader = ['id', '奖项名称', '申报人员名称', '申报人员单位', '申报人员部门', '标题', '单位', '部门', '简介', '得分(平均分)', '票数']
+        const filterVal = ['reportId', 'prizeName', 'name', 'company', 'department', 'reportName', 'reportCompany', 'reportDepartment', 'reportInfo', 'reportVideo', 'votes']
         const data = this.formatJson(filterVal, result.data)
         excel.export_json_to_excel({
           header: tHeader,
@@ -141,6 +159,12 @@ export default {
             return v[j].substr(0, 5)
           } else {
             return '无打分结果'
+          }
+        } else if(j === 'votes') {
+          if (v[j] !== null) {
+            return v[j]
+          } else {
+            return '无投票结果'
           }
         } else {
           return v[j]
