@@ -130,7 +130,7 @@ export function submitEvaluateResult(data) {
 
 export function adminGetScore(data) {
   return request({
-    url: '/report/getmarkresultsbyprizeidpage',
+    url: '/prizechoose/getmarkresultsbyprizeidpage',
     method: 'post',
     data
   })

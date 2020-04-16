@@ -303,7 +303,7 @@ export default {
       if( this.prize.evaluateMode == 0 ) {
         if(this.voteNum() <= this.prize.prizeNum) {
           const result = this.list.map(function(elem) {
-            let markScore = elem.score
+            let markScore = elem.vote
             return {
               prizeId: elem.prizeId,
               reportId: elem.reportId,
