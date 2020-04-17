@@ -7,6 +7,9 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
       </el-button>
+      <el-button v-waves :loading="downloadLoading" style="margin-left: 10px;margin-right: 10px;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+        导出申报明细
+      </el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -16,45 +19,33 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" align="center" width="80">
+      <el-table-column label="ID" align="center">
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="奖项名称" width="140" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.prizeName }}</span>
+      <el-table-column label="奖项名称" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.prizeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标题" width="110" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.reportName }}</span>
+      <el-table-column v-if="options[0].visible" :label="options[0].optionName" width="110" align="center" >
+        <template slot-scope="scope">
+          <span>{{ scope.row.reportName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="单位" width="150px" align="center">
+      <el-table-column v-if="options[1].visible" :label="options[1].optionName" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportCompany }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部门" width="150px" align="center">
+      <el-table-column v-if="options[2].visible" :label="options[2].optionName" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="照片" width="200" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="row.reportphotos[0].photoUrl"
-            :preview-src-list="row.reportphotos.map(function(elem) {
-              return elem.photoUrl
-            })">
-          </el-image>
-        </template>
-      </el-table-column>
-      <el-table-column label="简介" width="200" align="center">
+      <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="350px" align="center">
         <template slot-scope="{row}">
           <el-popover
             placement="top-start"
@@ -66,13 +57,83 @@
           </el-popover>
         </template>
       </el-table-column>
-      <!--<el-table-column label="附件" width="120px" align="center">
+      <el-table-column v-if="options[4].visible" :label="options[4].optionName" width="200" align="center" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-image
+            style="width: 100px; height: 100px"
+            :src="row.reportphotos[0].photoUrl"
+            :preview-src-list="row.reportphotos.map(function(elem) {
+            return elem.photoUrl
+          })">
+          </el-image>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[5].visible" :label="options[5].optionName" width="120px" align="center">
         <template slot-scope="{row}">
           <div v-for="(item, index) in row.reportdocuments" :key="index">
-            <el-link :href="item.documentUrl" type="success">{{item.documentName}}</el-link>
+            <el-link :href="item.documentUrl" type="success">{{ item.documentName }}</el-link>
           </div>
         </template>
-      </el-table-column>-->
+      </el-table-column>
+      <el-table-column v-if="options[6].visible" :label="options[6].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.deedsFile" :key="index">
+            <el-link :href="item.deedsUrl" type="success">{{ item.deedsName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[7].visible" :label="options[7].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.honorFile" :key="index">
+            <el-link :href="item.honorUrl" type="success">{{ item.honorName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[8].visible" :label="options[8].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.qualificationFile" :key="index">
+            <el-link :href="item.qualificationUrl" type="success">{{ item.qualificationName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[9].visible" :label="options[9].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.formFile" :key="index">
+            <el-link :href="item.formUrl" type="success">{{ item.formName }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[10].visible" :label="options[10].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText1 }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[11].visible" :label="options[11].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText2 }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[12].visible" :label="options[12].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile1" :key="index">
+            <el-link :href="item.other1Url" type="success">{{ item.other1Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[13].visible" :label="options[13].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile2" :key="index">
+            <el-link :href="item.other2Url" type="success">{{ item.other2Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[14].visible" :label="options[14].optionName" width="120px" align="center">
+        <template slot-scope="{row}">
+          <div v-for="(item, index) in row.otherFile3" :key="index">
+            <el-link :href="item.other3Url" type="success">{{ item.other3Name }}</el-link>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="留言" align="center" width="200px">
         <template slot-scope="{row}">
           <span>{{ judgeMessage(row) }}</span>
@@ -109,35 +170,9 @@
         <el-form-item label="部门" prop="department">
           <el-input v-model="temp.reportDepartment" placeholder="请输入部门名称"></el-input>
         </el-form-item>
-        <!--<el-form-item label="照片">
-          <el-upload
-            class="upload-demo"
-            :on-remove="handleRemovePicture"
-            :before-remove="beforeRemovePicture"
-            :on-success="handlerSuccessPicture"
-            :on-error="handlerErrorPicture"
-            action="http://localhost:9528/dev-api/api/upload"
-            list-type="picture">
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-        </el-form-item>-->
         <el-form-item label="简介" prop="reportInfo">
           <el-input v-model="temp.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="Please input" />
         </el-form-item>
-       <!-- <el-form-item label="附件">
-          <el-upload
-            class="upload-demo"
-            action="http://localhost:9528/dev-api/api/upload"
-            :on-remove="handleRemoveFile"
-            :before-remove="beforeRemoveFile"
-            :on-success="handlerSuccessFile"
-            :on-error="handlerErrorFile"
-            :limit="5"
-            :on-exceed="handleExceedFile"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
-        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -167,7 +202,7 @@
 </template>
 
 <script>
-import { adminUpdateMessage, adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
+import { adminGetAllReportByPrizeId, queryPrizeOptions, adminUpdateMessage, adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -189,6 +224,83 @@ export default {
   },
   data() {
     return {
+      options: [
+        {
+          id: 1,
+          optionName: '标题',
+          visible: true
+        },
+        {
+          id: 2,
+          optionName: '单位',
+          visible: true
+        },
+        {
+          id: 3,
+          optionName: '部门',
+          visible: true
+        },
+        {
+          id: 4,
+          optionName: '简介',
+          visible: true
+        },
+        {
+          id: 5,
+          optionName: '照片',
+          visible: true
+        },
+        {
+          id: 6,
+          optionName: '视频',
+          visible: true
+        },
+        {
+          id: 7,
+          optionName: '事迹材料',
+          visible: true
+        },
+        {
+          id: 8,
+          optionName: '荣誉证书',
+          visible: true
+        },
+        {
+          id: 9,
+          optionName: '资格证书',
+          visible: true
+        },
+        {
+          id: 10,
+          optionName: '申报表格',
+          visible: true
+        },
+        {
+          id: 11,
+          optionName: '其他文本1',
+          visible: true
+        },
+        {
+          id: 12,
+          optionName: '其他文本2',
+          visible: true
+        },
+        {
+          id: 13,
+          optionName: '其他附件1',
+          visible: true
+        },
+        {
+          id: 14,
+          optionName: '其他附件2',
+          visible: true
+        },
+        {
+          id: 15,
+          optionName: '其他附件3',
+          visible: true
+        }
+      ],
       dialogMessageVisible: false,
       message: {},
       myBackToTopStyle: {
@@ -209,7 +321,7 @@ export default {
       tableKey: 0,
       list: null,
       total: 0,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
         pageNum: 1,
         pageSize: 20,
@@ -248,10 +360,61 @@ export default {
     }
   },
   created() {
-    this.fetchAllMinePrize()
+    // this.fetchAllMinePrize()
     this.fetchPrizesName()
   },
   methods: {
+    async handleDownload() {
+      this.downloadLoading = true
+      /* const { data } = await queryPrizeOptions({ prizeId: this.listQuery.prizeId })
+      const options = data.filter(elem => {
+        if (elem.visible == 'true') {
+          return {
+            optionColumn: elem.optionColumn,
+            optionName: elem.optionName
+          }
+        }
+      })*/
+      const result = await adminGetAllReportByPrizeId({ prizeId: this.listQuery.prizeId })
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['id', '奖项名称', '申报人员名称', '申报人员单位', '申报人员部门', '标题', '单位', '部门', '简介', '文本1', '文本2']
+        const filterVal = ['reportId', 'prizeName', 'name', 'company', 'department', 'reportName', 'reportCompany', 'reportDepartment', 'reportInfo', 'otherText1', 'otherText2']
+        /* const tHeader = options.map(elem => {
+          return elem.optionName
+        })
+        const filterVal = options.map(elem => {
+          return elem.optionColumn
+        })
+        console.log(options)*/
+        const data = this.formatJson(filterVal, result.data)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '申报明细表',
+          bookType: this.bookType
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => {
+        if (j === 'reportVideo') {
+          if (v[j] !== null) {
+            return v[j].substr(0, 5)
+          } else {
+            return '无打分结果'
+          }
+        } else if(j === 'votes') {
+          if (v[j] !== null) {
+            return v[j]
+          } else {
+            return '无投票结果'
+          }
+        } else {
+          return v[j]
+        }
+      }))
+    },
     judgeMessage(row) {
       if (row.reportPhoto1 == null) {
         return '暂无留言'
@@ -260,7 +423,6 @@ export default {
       }
     },
     handleSubmitMessage() {
-      console.log(this.message)
       adminUpdateMessage({ reportId: this.message.reportId, reportPhoto1: this.message.reportPhoto1 }).then(response => {
         if (response.errno == 20000) {
           this.$notify.success({
@@ -273,7 +435,7 @@ export default {
             message: '留言失败'
           })
         }
-        this.fetchAllMinePrize()
+        this.handleFilter()
         this.dialogMessageVisible = false
       })
     },
@@ -292,7 +454,7 @@ export default {
         } else {
           this.$message.error('修改失败，请重试')
         }
-        setTimeout(this.fetchAllMinePrize(), 1000)
+        setTimeout(this.handleFilter(), 1000)
       })
     },
     handleSubmit() {
@@ -327,6 +489,19 @@ export default {
       })
     },
     handleFilter() {
+      this.listLoading = true
+      queryPrizeOptions({ prizeId: this.listQuery.prizeId }).then(response => {
+        if (response.errno == 20000) {
+          this.options = []
+          this.options = response.data.map(elem => {
+            return {
+              id: elem.chooseId,
+              optionName: elem.optionName,
+              visible: JSON.parse(elem.visible)
+            }
+          })
+        }
+      })
       adminGetReportById(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.list.length

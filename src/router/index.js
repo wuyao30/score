@@ -105,6 +105,19 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/prize',
+    component: Layout,
+    name: 'prize',
+    children: [
+      {
+        path: 'index',
+        name: 'prizeIndex',
+        component: () => import('@/views/prize/index'),
+        meta: { title: '评审管理', icon: 'jiangxiang', roles: ['admin'] }
+      }
+    ]
+  },
+  {
     path: '/person',
     component: Layout,
     name: 'person',
@@ -125,28 +138,15 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/prize',
+    path: '/delete',
     component: Layout,
-    name: 'prize',
+    name: 'delete',
     children: [
       {
         path: 'index',
-        name: 'prizeIndex',
-        component: () => import('@/views/prize/index'),
-        meta: { title: '评审管理', icon: 'jiangxiang', roles: ['admin'] }
-      }
-    ]
-  },
-  {
-    path: '/score',
-    component: Layout,
-    name: 'score',
-    children: [
-      {
-        path: 'index',
-        name: 'scoreIndex',
-        component: () => import('@/views/score/index'),
-        meta: { title: '评优评先', icon: 'pingjia', roles: ['marker'] }
+        name: 'deleteIndex',
+        component: () => import('@/views/delete/index'),
+        meta: { title: '资格审查', icon: 'delete', roles: ['admin'] }
       }
     ]
   },
@@ -164,15 +164,15 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/delete',
+    path: '/score',
     component: Layout,
-    name: 'delete',
+    name: 'score',
     children: [
       {
         path: 'index',
-        name: 'deleteIndex',
-        component: () => import('@/views/delete/index'),
-        meta: { title: '修改评选资格', icon: 'delete', roles: ['admin'] }
+        name: 'scoreIndex',
+        component: () => import('@/views/score/index'),
+        meta: { title: '评优评先', icon: 'pingjia', roles: ['marker'] }
       }
     ]
   },

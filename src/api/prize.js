@@ -236,3 +236,11 @@ export function adminModifyOPtionsName(data) {
     data
   })
 }
+
+export function adminGetAllReportByPrizeId(data) {
+  return request({
+    url: '/prizechoose/getmarkresultbyprizeid',
+    method: 'post',
+    data
+  })
+}
