@@ -147,6 +147,16 @@
           <span>{{ judgeMessage(row) }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="操作" align="center" width="200px" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            编辑
+          </el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination v-if="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
@@ -172,6 +182,11 @@
             :before-remove="beforeRemovePicture"
             :on-success="handlerSuccessPicture"
             :on-error="handlerErrorPicture"
+            :file-list="form.reportphotos.map(function(elem) {
+                        return {
+                          url: elem.photoUrl
+                        }
+                      })"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
             list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
@@ -187,6 +202,12 @@
             :on-error="handlerErrorFile"
             :limit="5"
             :on-exceed="handleExceedFile"
+            :file-list="form.reportdocuments.map(function(elem) {
+                        return {
+                          name: elem.documentName,
+                          url: elem.documentUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -199,6 +220,12 @@
             :before-remove="beforeRemoveDeedsFile"
             :on-success="handlerSuccessDeedsFile"
             :on-error="handlerErrorDeedsFile"
+            :file-list="form.deedsFile.map(function(elem) {
+                        return {
+                          name: elem.deedsName,
+                          url: elem.deedsUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -211,6 +238,12 @@
             :before-remove="beforeRemoveHonorFile"
             :on-success="handlerSuccessHonorFile"
             :on-error="handlerErrorHonorFile"
+            :file-list="form.honorFile.map(function(elem) {
+                        return {
+                          name: elem.honorName,
+                          url: elem.honorUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -223,6 +256,12 @@
             :before-remove="beforeRemoveQualificationFile"
             :on-success="handlerSuccessQualificationFile"
             :on-error="handlerErrorQualificationFile"
+            :file-list="form.qualificationFile.map(function(elem) {
+                        return {
+                          name: elem.qualificationName,
+                          url: elem.qualificationUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -235,6 +274,12 @@
             :before-remove="beforeRemoveFormFile"
             :on-success="handlerSuccessFormFile"
             :on-error="handlerErrorFormFile"
+            :file-list="form.formFile.map(function(elem) {
+                        return {
+                          name: elem.formName,
+                          url: elem.formUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -253,6 +298,12 @@
             :before-remove="beforeRemoveOther1File"
             :on-success="handlerSuccessOther1File"
             :on-error="handlerErrorOther1File"
+            :file-list="form.otherFile1.map(function(elem) {
+                        return {
+                          name: elem.other1Name,
+                          url: elem.other1Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -265,6 +316,12 @@
             :before-remove="beforeRemoveOther2File"
             :on-success="handlerSuccessOther2File"
             :on-error="handlerErrorOther2File"
+            :file-list="form.otherFile2.map(function(elem) {
+                        return {
+                          name: elem.other2Name,
+                          url: elem.other2Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -277,6 +334,12 @@
             :before-remove="beforeRemoveOther3File"
             :on-success="handlerSuccessOther3File"
             :on-error="handlerErrorOther3File"
+            :file-list="form.otherFile3.map(function(elem) {
+                        return {
+                          name: elem.other3Name,
+                          url: elem.other3Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -473,21 +536,21 @@
       },
       handleSubmit() {
         console.log(this.form)
-        updateReport(this.form).then(response => {
-          if (response.errno == 20000 ) {
-            this.$message({
-              message: '修改申报明细成功',
-              type: 'success'
-            })
-          } else {
-            this.$message({
-              message: '修改申报明细失败',
-              type: 'error'
-            })
-            this.fetchAllMinePrize()
-          }
-        })
-        this.dialogFormVisible = false
+        // updateReport(this.form).then(response => {
+        //   if (response.errno == 20000 ) {
+        //     this.$message({
+        //       message: '修改申报明细成功',
+        //       type: 'success'
+        //     })
+        //   } else {
+        //     this.$message({
+        //       message: '修改申报明细失败',
+        //       type: 'error'
+        //     })
+        //     this.fetchAllMinePrize()
+        //   }
+        // })
+        // this.dialogFormVisible = false
       },
       fetchPrizesName() {
         getSpecificPrizeKind().then(response => {
@@ -543,15 +606,16 @@
       },
       handleUpdate(row) {
         this.form = Object.assign({}, row) // copy obj
-        this.form.reportphotos.splice(0, this.form.reportphotos.length)
-        this.form.reportdocuments.splice(0, this.form.reportdocuments.length)
-        this.form.deedsFile.splice(0, this.form.deedsFile.length)
-        this.form.honorFile.splice(0, this.form.honorFile.length)
-        this.form.qualificationFile.splice(0, this.form.qualificationFile.length)
-        this.form.formFile.splice(0, this.form.formFile.length)
-        this.form.otherFile1.splice(0, this.form.otherFile1.length)
-        this.form.otherFile2.splice(0, this.form.otherFile2.length)
-        this.form.otherFile3.splice(0, this.form.otherFile3.length)
+        console.log(this.form)
+        // this.form.reportphotos.splice(0, this.form.reportphotos.length)
+        // this.form.reportdocuments.splice(0, this.form.reportdocuments.length)
+        // this.form.deedsFile.splice(0, this.form.deedsFile.length)
+        // this.form.honorFile.splice(0, this.form.honorFile.length)
+        // this.form.qualificationFile.splice(0, this.form.qualificationFile.length)
+        // this.form.formFile.splice(0, this.form.formFile.length)
+        // this.form.otherFile1.splice(0, this.form.otherFile1.length)
+        // this.form.otherFile2.splice(0, this.form.otherFile2.length)
+        // this.form.otherFile3.splice(0, this.form.otherFile3.length)
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {

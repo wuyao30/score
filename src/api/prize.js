@@ -236,3 +236,18 @@ export function adminModifyOPtionsName(data) {
     data
   })
 }
+
+export function evaluateGetPrizes() {
+  return request({
+    url: '/report/getmymarkchoose',
+    method: 'get'
+  })
+}
+
+export function evaluatePostPrizeInfo(data) {
+  return request({
+    url: '/report/getmymarkreports',
+    method: 'post',
+    data
+  })
+}

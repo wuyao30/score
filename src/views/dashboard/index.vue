@@ -43,12 +43,12 @@
           <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="350px" align="center">
+      <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="400" align="center">
         <template slot-scope="{row}">
           <el-popover
             placement="top-start"
             title="简介信息"
-            width="500"
+            width="400"
             trigger="hover"
             :content=row.reportInfo>
             <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
@@ -147,7 +147,7 @@
     <pagination v-if="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="form"  label-position="right" label-width="120px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="form"  label-position="right" label-width="120px" style="width: 600px; margin-left:50px;">
         <el-form-item :label="options[0].optionName" v-if="options[0].visible">
           <el-input v-model="form.reportName" width="80" />
         </el-form-item>
@@ -167,6 +167,11 @@
             :before-remove="beforeRemovePicture"
             :on-success="handlerSuccessPicture"
             :on-error="handlerErrorPicture"
+            :file-list="form.reportphotos.map(function(elem) {
+                        return {
+                          url: elem.photoUrl
+                        }
+                      })"
             action="http://139.224.135.165:8080/assess/report/addreportphoto"
             list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
@@ -182,6 +187,12 @@
             :on-error="handlerErrorFile"
             :limit="5"
             :on-exceed="handleExceedFile"
+            :file-list="form.reportdocuments.map(function(elem) {
+                        return {
+                          name: elem.documentName,
+                          url: elem.documentUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -194,6 +205,12 @@
             :before-remove="beforeRemoveDeedsFile"
             :on-success="handlerSuccessDeedsFile"
             :on-error="handlerErrorDeedsFile"
+            :file-list="form.deedsFile.map(function(elem) {
+                        return {
+                          name: elem.deedsName,
+                          url: elem.deedsUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -206,6 +223,12 @@
             :before-remove="beforeRemoveHonorFile"
             :on-success="handlerSuccessHonorFile"
             :on-error="handlerErrorHonorFile"
+            :file-list="form.honorFile.map(function(elem) {
+                        return {
+                          name: elem.honorName,
+                          url: elem.honorUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -218,6 +241,12 @@
             :before-remove="beforeRemoveQualificationFile"
             :on-success="handlerSuccessQualificationFile"
             :on-error="handlerErrorQualificationFile"
+            :file-list="form.qualificationFile.map(function(elem) {
+                        return {
+                          name: elem.qualificationName,
+                          url: elem.qualificationUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -230,6 +259,12 @@
             :before-remove="beforeRemoveFormFile"
             :on-success="handlerSuccessFormFile"
             :on-error="handlerErrorFormFile"
+            :file-list="form.formFile.map(function(elem) {
+                        return {
+                          name: elem.formName,
+                          url: elem.formUrl
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -248,6 +283,12 @@
             :before-remove="beforeRemoveOther1File"
             :on-success="handlerSuccessOther1File"
             :on-error="handlerErrorOther1File"
+            :file-list="form.otherFile1.map(function(elem) {
+                        return {
+                          name: elem.other1Name,
+                          url: elem.other1Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -260,6 +301,12 @@
             :before-remove="beforeRemoveOther2File"
             :on-success="handlerSuccessOther2File"
             :on-error="handlerErrorOther2File"
+            :file-list="form.otherFile2.map(function(elem) {
+                        return {
+                          name: elem.other2Name,
+                          url: elem.other2Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -272,6 +319,12 @@
             :before-remove="beforeRemoveOther3File"
             :on-success="handlerSuccessOther3File"
             :on-error="handlerErrorOther3File"
+            :file-list="form.otherFile3.map(function(elem) {
+                        return {
+                          name: elem.other3Name,
+                          url: elem.other3Url
+                        }
+                      })"
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -531,15 +584,15 @@ export default {
     },
     handleUpdate(row) {
       this.form = Object.assign({}, row) // copy obj
-      this.form.reportphotos.splice(0, this.form.reportphotos.length)
-      this.form.reportdocuments.splice(0, this.form.reportdocuments.length)
-      this.form.deedsFile.splice(0, this.form.deedsFile.length)
-      this.form.honorFile.splice(0, this.form.honorFile.length)
-      this.form.qualificationFile.splice(0, this.form.qualificationFile.length)
-      this.form.formFile.splice(0, this.form.formFile.length)
-      this.form.otherFile1.splice(0, this.form.otherFile1.length)
-      this.form.otherFile2.splice(0, this.form.otherFile2.length)
-      this.form.otherFile3.splice(0, this.form.otherFile3.length)
+      // this.form.reportphotos.splice(0, this.form.reportphotos.length)
+      // this.form.reportdocuments.splice(0, this.form.reportdocuments.length)
+      // this.form.deedsFile.splice(0, this.form.deedsFile.length)
+      // this.form.honorFile.splice(0, this.form.honorFile.length)
+      // this.form.qualificationFile.splice(0, this.form.qualificationFile.length)
+      // this.form.formFile.splice(0, this.form.formFile.length)
+      // this.form.otherFile1.splice(0, this.form.otherFile1.length)
+      // this.form.otherFile2.splice(0, this.form.otherFile2.length)
+      // this.form.otherFile3.splice(0, this.form.otherFile3.length)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {

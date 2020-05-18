@@ -67,8 +67,8 @@
       </el-table-column>
       <el-table-column label="打分权限" align="center" width="200">
         <template slot-scope="scope">
-          <el-tag type="success">
-            {{ scope.row.industryName }}
+          <el-tag v-for="(item, index) in scope.row.optionss" :key="index" type="success">
+            {{ item.prizeName }}
           </el-tag>
         </template>
       </el-table-column>
@@ -116,8 +116,11 @@
         <el-form-item label="部门" prop="department">
           <el-input v-model="temp.department" />
         </el-form-item>
-        <el-form-item label="奖项名称" prop="enableFlage2">
-          <el-select v-model="temp.enableFlage2" placeholder="请选择奖项名称">
+        <el-form-item label="奖项名称" prop="options">
+          <el-select
+            v-model="temp.options"
+            placeholder="请选择奖项名称"
+            multiple>
             <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" :disabled="item.disabled" />
           </el-select>
         </el-form-item>
@@ -151,8 +154,11 @@
         <el-form-item label="部门" prop="department">
           <el-input v-model="temp.department" />
         </el-form-item>
-        <el-form-item label="奖项名称" prop="enableFlage2">
-          <el-select v-model="temp.enableFlage2" placeholder="请选择奖项名称">
+        <el-form-item label="奖项名称" prop="options">
+          <el-select
+            v-model="temp.options"
+            placeholder="请选择奖项名称"
+            multiple>
             <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" :disabled="item.disabled" />
           </el-select>
         </el-form-item>
@@ -204,12 +210,12 @@ export default {
       temp: {
         userId: undefined,
         loginName: undefined,
-        username: undefined,
+        name: undefined,
         password: undefined,
         telephone: undefined,
         company: undefined,
         department: undefined,
-        enableFlage2: undefined
+        options: []
       },
       dialogFormVisible: false,
       rules: {
@@ -224,7 +230,7 @@ export default {
         telephone: [{ required: true, message: '手机号码为必填项', trigger: 'blur' }],
         company: [{ required: true, message: '单位为必填项', trigger: 'blur' }],
         department: [{ required: true, message: '部门为必填项', trigger: 'blur' }],
-        enableFlage2: [{ required: true, message: '奖项名称为必填项', trigger: 'change' }]
+        options: [{ required: true, message: '奖项名称为必填项', trigger: 'change' }]
       },
       downloadLoading: false,
       myBackToTopStyle: {
@@ -306,6 +312,8 @@ export default {
     confirmUpdatePsw(raw) {
       this.dialogUpdateFormVisible = true
       this.temp = Object.assign({}, raw)
+      this.temp.options = this.temp.optionss.map(e => e.prizeId)
+      console.log(this.temp)
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

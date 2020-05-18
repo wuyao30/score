@@ -1,5 +1,13 @@
 <template>
   <div class="app-container">
+    <div class="prize-select">
+      <el-select v-model="listQuery.prizeId" placeholder="奖项名称" clearable class="filter-item" style="width: 250px">
+        <el-option v-for="item in prizeNameOptions" :key="item.prizeId" :label="item.prizeName" :value="item.prizeId" />
+      </el-select>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        查询
+      </el-button>
+    </div>
     <div class="card-wrapper">
       <el-card class="box-card" shadow="hover">
         <div slot="header" class="clearfix" style="text-align: left;">
@@ -145,12 +153,13 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="评审" align="center" width="200px" class-name="small-padding fixed-width">
+      <el-table-column label="评审" align="center" width="250" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-input v-if="prize.evaluateMode == 1" @input="ScoreInputHandle" v-model="row.score" placeholder="请输入分数"></el-input>
           <el-radio-group v-if="prize.evaluateMode == 0" v-model="row.vote">
-            <el-radio :label="1">同意</el-radio>
-            <el-radio :label="0">不同意</el-radio>
+            <el-radio :label="1">赞成</el-radio>
+            <el-radio :label="0">反对</el-radio>
+            <el-radio :label="2">弃权</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>
@@ -162,11 +171,14 @@
 </template>
 
 <script>
-import { queryPrizeOptions, queryEvaluationPrizeInfo, submitEvaluateResult, evaluateGetPrizeInfo } from '../../api/prize'
+import { queryOptionsByPrizeId, evaluatePostPrizeInfo, evaluateGetPrizes, queryPrizeOptions, queryEvaluationPrizeInfo, submitEvaluateResult, evaluateGetPrizeInfo } from '../../api/prize'
 export default {
   name: 'Index',
   data() {
     return {
+      listQuery: {
+        prizeId: undefined,
+      },
       listLoading: true,
       tableKey: 0,
       temp: {},
@@ -249,10 +261,14 @@ export default {
           visible: true
         }
       ],
+      prizeNameOptions: []
     }
   },
   created() {
-    queryEvaluationPrizeInfo().then(response => {
+    evaluateGetPrizes().then(response => {
+      this.prizeNameOptions = response.data
+    })
+   /* queryEvaluationPrizeInfo().then(response => {
       this.templateMethod(response)
       this.list = response.data.map(function(elem) {
         Object.assign(elem, {
@@ -262,24 +278,33 @@ export default {
         return elem
       })
       this.listLoading = false
-    })
-    evaluateGetPrizeInfo().then(response => {
-      this.prize = response.data
-    })
-    queryPrizeOptions({ prizeId: this.$store.state.user.prizeId }).then(response => {
-      if (response.errno == 20000) {
-        this.options = []
-        this.options = response.data.map(elem => {
-          return {
-            id: elem.chooseId,
-            optionName: elem.optionName,
-            visible: JSON.parse(elem.visible)
-          }
-        })
-      }
-    })
+    })*/
+    // evaluateGetPrizeInfo().then(response => {
+    //   this.prize = response.data
+    // })
   },
   methods: {
+    handleFilter() {
+      queryPrizeOptions({prizeId: this.listQuery.prizeId}).then(response => {
+        if (response.errno == 20000) {
+          this.options = []
+          this.options = response.data.map(elem => {
+            return {
+              id: elem.chooseId,
+              optionName: elem.optionName,
+              visible: JSON.parse(elem.visible)
+            }
+          })
+        }
+      })
+      evaluatePostPrizeInfo({prizeId: this.listQuery.prizeId}).then(response => {
+        this.list = response.data
+        this.listLoading = false
+      })
+      queryOptionsByPrizeId({prizeId: this.listQuery.prizeId}).then(res => {
+        this.prize = res.data[0]
+      })
+    },
     templateMethod(response) {
       if (response.errno == 20000) {
         this.$message.success('获取信息成功')
@@ -288,21 +313,21 @@ export default {
       }
     },
     voteNum() {
-      const highScore = this.list.filter(function(elem) {
+      const highScore = this.list.filter(function (elem) {
         return elem.vote == 1
       })
       return highScore.length
     },
     scoreNum() {
-      const highScore = this.list.filter(function(elem) {
+      const highScore = this.list.filter(function (elem) {
         return elem.score >= 90 && elem.score <= 100
       })
       return highScore.length
     },
     submitForm() {
-      if( this.prize.evaluateMode == 0 ) {
-        if(this.voteNum() <= this.prize.prizeNum) {
-          const result = this.list.map(function(elem) {
+      if (this.prize.evaluateMode == 0) {
+        if (this.voteNum() <= this.prize.prizeNum) {
+          const result = this.list.map(function (elem) {
             let markScore = elem.vote
             return {
               prizeId: elem.prizeId,
@@ -329,10 +354,10 @@ export default {
             message: '评审结果数量应小于等于奖项要求数量'
           })
         }
-      } else if (this.prize.evaluateMode == 1 ) {
+      } else if (this.prize.evaluateMode == 1) {
         console.log(this.scoreNum(), this.prize.prizeNum)
-        if(this.scoreNum() <= this.prize.prizeNum ) {
-          const result = this.list.map(function(elem) {
+        if (this.scoreNum() <= this.prize.prizeNum) {
+          const result = this.list.map(function (elem) {
             let markScore = elem.score
             return {
               prizeId: elem.prizeId,
@@ -366,8 +391,8 @@ export default {
           message: '评审结果数量应小于等于奖项要求数量'
         })
       }
-      }
     }
+  }
 }
 </script>
 

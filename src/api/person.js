@@ -72,7 +72,7 @@ export function insertEvaluation(data) {
 
 export function updateOnePerson(data) {
   return request({
-    url: '/user/updateone',
+    url: '/user/updateonemarker',
     method: 'post',
     data
   })
