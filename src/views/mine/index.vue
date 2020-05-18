@@ -48,7 +48,7 @@
           <el-popover
             placement="top-start"
             title="简介信息"
-            width="500"
+            width="300"
             trigger="hover"
             :content=row.reportInfo>
             <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
