@@ -7,6 +7,9 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
       </el-button>
+      <el-button :disabled="download" v-waves class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+        导出申报明细
+      </el-button>
     </div>
     <el-table
       :key="tableKey"
@@ -369,7 +372,7 @@
 </template>
 
 <script>
-import { queryPrizeOptions, adminUpdateMessage, adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
+import { adminGetScoreNoPagenite, queryPrizeOptions, adminUpdateMessage, adminUpdateReportStatus, adminUpdateReport, adminGetReportById, adminGetModifyReport, updateReport, getSpecificPrizeKind } from '../../api/prize'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -391,6 +394,7 @@ export default {
   },
   data() {
     return {
+      download: true,
       form: {
         reportId: undefined,
         reportName: '',
@@ -551,6 +555,41 @@ export default {
     this.fetchPrizesName()
   },
   methods: {
+    async handleDownload() {
+      this.downloadLoading = true
+      const result = await adminGetScoreNoPagenite({ prizeId: this.listQuery.prizeId })
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['id', '奖项名称', '申报人员名称', '申报人员单位', '申报人员部门', '标题', '单位', '部门', '简介', `${this.options[11].optionName}`, `${this.options[12].optionName}`]
+        const filterVal = ['reportId', 'prizeName', 'name', 'company', 'department', 'reportName', 'reportCompany', 'reportDepartment', 'reportInfo', 'otherText1', 'otherText2']
+        const data = this.formatJson(filterVal, result.data)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: '申报明细',
+          bookType: this.bookType
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => {
+        if (j === 'reportVideo') {
+          if (v[j] !== null) {
+            return v[j].substr(0, 5)
+          } else {
+            return '无打分结果'
+          }
+        } else if(j === 'votes') {
+          if (v[j] !== null) {
+            return v[j]
+          } else {
+            return '无投票结果'
+          }
+        } else {
+          return v[j]
+        }
+      }))
+    },
     judgeMessage(row) {
       if (row.reportPhoto1 == null) {
         return '暂无留言'
@@ -628,6 +667,7 @@ export default {
       })
     },
     handleFilter() {
+      this.download = false
       this.tableShow = true
       queryPrizeOptions({ prizeId: this.listQuery.prizeId }).then(response => {
         if (response.errno == 20000) {
