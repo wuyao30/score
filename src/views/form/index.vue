@@ -16,6 +16,12 @@
         <el-form-item :label="options[2].optionName" v-show="options[2].visible">
           <el-input v-model="form.reportDepartment" width="80" />
         </el-form-item>
+        <el-form-item :label="options[10].optionName" v-show="options[10].visible">
+          <el-input v-model="form.otherText1" width="80" />
+        </el-form-item>
+        <el-form-item :label="options[11].optionName" v-show="options[11].visible">
+          <el-input v-model="form.otherText2" width="80" />
+        </el-form-item>
         <el-form-item :label="options[3].optionName" v-show="options[3].visible">
           <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
         </el-form-item>
@@ -92,12 +98,6 @@
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
-        </el-form-item>
-        <el-form-item :label="options[10].optionName" v-show="options[10].visible">
-          <el-input v-model="form.otherText1" width="80" />
-        </el-form-item>
-        <el-form-item :label="options[11].optionName" v-show="options[11].visible">
-          <el-input v-model="form.otherText2" width="80" />
         </el-form-item>
         <el-form-item :label="options[12].optionName" v-show="options[13].visible">
           <el-upload

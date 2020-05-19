@@ -43,6 +43,16 @@
           <span>{{ row.reportDepartment }}</span>
         </template>
       </el-table-column>
+      <el-table-column v-if="options[10].visible" :label="options[10].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText1 }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="options[11].visible" :label="options[11].optionName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.otherText2 }}</span>
+        </template>
+      </el-table-column>
       <el-table-column v-if="options[3].visible" :label="options[3].optionName" width="350px" align="center">
         <template slot-scope="{row}">
           <el-popover
@@ -101,16 +111,6 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-if="options[10].visible" :label="options[10].optionName" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.otherText1 }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="options[11].visible" :label="options[11].optionName" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.otherText2 }}</span>
-        </template>
-      </el-table-column>
       <el-table-column v-if="options[12].visible" :label="options[12].optionName" width="120px" align="center">
         <template slot-scope="{row}">
           <div v-for="(item, index) in row.otherFile1" :key="index">
@@ -162,7 +162,7 @@
     <pagination v-if="total>0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="handleFilter" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="form"  label-position="right" label-width="120px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="form"  label-position="right" label-width="120px" style="width: 600px; margin-left:50px;">
         <el-form-item :label="options[0].optionName" v-if="options[0].visible">
           <el-input v-model="form.reportName" width="80" />
         </el-form-item>
@@ -171,6 +171,12 @@
         </el-form-item>
         <el-form-item :label="options[2].optionName" v-if="options[2].visible">
           <el-input v-model="form.reportDepartment" width="80" />
+        </el-form-item>
+        <el-form-item :label="options[10].optionName" v-if="options[10].visible">
+          <el-input v-model="form.otherText1" width="80" />
+        </el-form-item>
+        <el-form-item :label="options[11].optionName" v-if="options[11].visible">
+          <el-input v-model="form.otherText2" width="80" />
         </el-form-item>
         <el-form-item :label="options[3].optionName" v-if="options[3].visible">
           <el-input v-model="form.reportInfo" :autosize="{ minRows: 2, maxRows: 99}" type="textarea" placeholder="请输入简介信息" />
@@ -283,12 +289,6 @@
           >
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
-        </el-form-item>
-        <el-form-item :label="options[10].optionName" v-if="options[10].visible">
-          <el-input v-model="form.otherText1" width="80" />
-        </el-form-item>
-        <el-form-item :label="options[11].optionName" v-if="options[11].visible">
-          <el-input v-model="form.otherText2" width="80" />
         </el-form-item>
         <el-form-item :label="options[12].optionName" v-if="options[13].visible">
           <el-upload
@@ -536,21 +536,21 @@
       },
       handleSubmit() {
         console.log(this.form)
-        // updateReport(this.form).then(response => {
-        //   if (response.errno == 20000 ) {
-        //     this.$message({
-        //       message: '修改申报明细成功',
-        //       type: 'success'
-        //     })
-        //   } else {
-        //     this.$message({
-        //       message: '修改申报明细失败',
-        //       type: 'error'
-        //     })
-        //     this.fetchAllMinePrize()
-        //   }
-        // })
-        // this.dialogFormVisible = false
+        updateReport(this.form).then(response => {
+          if (response.errno == 20000 ) {
+            this.$message({
+              message: '修改申报明细成功',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: '修改申报明细失败',
+              type: 'error'
+            })
+            this.fetchAllMinePrize()
+          }
+        })
+        this.dialogFormVisible = false
       },
       fetchPrizesName() {
         getSpecificPrizeKind().then(response => {
@@ -653,10 +653,9 @@
         this.$message.error('上传附件失败，请刷新重试')
       },
       handleRemoveFile(file, fileList) {
-        let FileIndex = this.form.reportdocuments.filter((elem, index) => {
-          if (elem.documentName == file.name) {
-            return index
-          }
+        console.log(file.name)
+        let FileIndex = this.form.reportdocuments.findIndex((elem, index) => {
+          return elem.documentName == file.name
         })
         this.form.reportdocuments.splice(FileIndex, 1)
       },
@@ -677,10 +676,8 @@
         this.$message.error('上传图片失败，请刷新重试')
       },
       handleRemovePicture(file, fileList) {
-        let PictureIndex = this.form.reportphotos.filter((elem, index) => {
-          if (elem.name == file.name) {
-            return index
-          }
+        let PictureIndex = this.form.reportphotos.findIndex(e => {
+          return e.name = file.name
         })
         this.form.reportphotos.splice(PictureIndex, 1)
       },
@@ -691,7 +688,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveDeedsFile(file, fileList) {
-        let FileIndex = this.form.deedsFile.filter((elem, index) => {
+        let FileIndex = this.form.deedsFile.findIndex((elem, index) => {
           if (elem.deedsName == file.name) {
             return index
           }
@@ -712,7 +709,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveHonorFile(file, fileList) {
-        let FileIndex = this.form.honorFile.filter((elem, index) => {
+        let FileIndex = this.form.honorFile.findIndex((elem, index) => {
           if (elem.honorName == file.name) {
             return index
           }
@@ -732,7 +729,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveQualificationFile(file, fileList) {
-        let FileIndex = this.form.qualificationFile.filter((elem, index) => {
+        let FileIndex = this.form.qualificationFile.findIndex((elem, index) => {
           if (elem.qualificationName == file.name) {
             return index
           }
@@ -752,7 +749,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveFormFile(file, fileList) {
-        let FileIndex = this.form.formFile.filter((elem, index) => {
+        let FileIndex = this.form.formFile.findIndex((elem, index) => {
           if (elem.formName == file.name) {
             return index
           }
@@ -772,7 +769,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveOther1File(file, fileList) {
-        let FileIndex = this.form.otherFile1.filter((elem, index) => {
+        let FileIndex = this.form.otherFile1.findIndex((elem, index) => {
           if (elem.other1Name == file.name) {
             return index
           }
@@ -792,7 +789,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveOther2File(file, fileList) {
-        let FileIndex = this.form.otherFile2.filter((elem, index) => {
+        let FileIndex = this.form.otherFile2.findIndex((elem, index) => {
           if (elem.other2Name == file.name) {
             return index
           }
@@ -812,7 +809,7 @@
         return this.$confirm(`确定移除 ${file.name}？`)
       },
       handleRemoveOther3File(file, fileList) {
-        let FileIndex = this.form.otherFile3.filter((elem, index) => {
+        let FileIndex = this.form.otherFile3.findIndex((elem, index) => {
           if (elem.other3Name == file.name) {
             return index
           }

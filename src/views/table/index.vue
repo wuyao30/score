@@ -13,7 +13,13 @@
             :data="props.row.reports"
             style="width: 100%;">
             <el-table-column
-              label="标题">
+              label="序号" width="80">
+              <template slot-scope="scope">
+                <span>{{scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="候选人">
               <template slot-scope="scope">
                 <span>{{scope.row.reportName}}</span>
               </template>
@@ -33,6 +39,27 @@
               </template>
             </el-table-column>
             <el-table-column
+              label="职位"
+            >
+              <template slot-scope="scope">
+                <span>{{scope.row.otherText1}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="简介"
+            >
+              <template slot-scope="{row}">
+                <el-popover
+                  placement="top-start"
+                  title="简介信息"
+                  width="400"
+                  trigger="hover"
+                  :content=row.reportInfo>
+                  <el-button slot="reference">{{ row.reportInfo | substrInfo }}</el-button>
+                </el-popover>
+              </template>
+            </el-table-column>
+            <el-table-column
               label="申报人员"
               >
               <template slot-scope="scope">
@@ -43,7 +70,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="ID">
+        label="序号" width="80">
         <template slot-scope="scope">
           <span>{{scope.$index + 1}}</span>
         </template>
